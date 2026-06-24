@@ -1,0 +1,516 @@
+@extends('layouts.app')
+
+@section('content')
+
+<div class="lg:grid lg:grid-cols-[1fr_280px] lg:gap-8">
+
+{{-- ── Main column ──────────────────────────────────────────────────────── --}}
+<div class="min-w-0">
+
+    {{-- Breadcrumb --}}
+    <nav class="mb-4 flex items-center gap-2 text-sm text-slate-500" aria-label="Breadcrumb">
+        <a href="{{ route('crypto.index') }}" class="hover:text-white transition">Market</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-slate-300">{{ $crypto->name }}</span>
+    </nav>
+
+    {{-- Header: name + live price --}}
+    <div class="mb-6 flex flex-wrap items-start gap-4"
+         x-data="coinDetail('{{ $crypto->slug }}', {{ (float)$crypto->current_price }}, {{ (float)($crypto->price_change_percentage_24h_in_currency ?? 0) }})"
+         x-init="init()">
+
+        <div class="flex items-center gap-3">
+            @if ($crypto->image_url)
+                <img src="{{ $crypto->image_url }}" alt="{{ e($crypto->name) }}" class="h-12 w-12 rounded-full" width="48" height="48">
+            @endif
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-extrabold text-white">{{ e($crypto->name) }}</h1>
+                    <span class="rounded-md bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-400 uppercase">{{ e($crypto->symbol) }}</span>
+                    @if($crypto->market_cap_rank)
+                        <span class="rounded-md bg-blue-950/50 border border-blue-800/30 px-2 py-0.5 text-xs font-semibold text-blue-400">#{{ $crypto->market_cap_rank }}</span>
+                    @endif
+                </div>
+                <div class="flex items-center gap-3 mt-1">
+                    {{-- Binance connected indicator --}}
+                    <span x-show="$store.liveprices.binanceConnected" x-cloak
+                          class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                        Live · Binance
+                    </span>
+                    <a href="{{ route('crypto.compare', ['slugA' => $crypto->slug, 'slugB' => 'bitcoin']) }}"
+                       class="text-[10px] text-slate-500 hover:text-blue-400 transition">⚖️ Compare</a>
+                </div>
+            </div>
+        </div>
+
+        {{-- Live price block --}}
+        <div class="ml-auto text-right">
+            <p class="text-4xl font-black text-white tabular-nums transition-all"
+               :class="flashClass"
+               x-text="formattedPrice">
+            </p>
+            <div class="flex items-center justify-end gap-2 mt-1">
+                <span :class="change24hColor" class="text-sm font-semibold tabular-nums" x-text="change24hLabel"></span>
+                <span class="text-xs text-slate-500">24h</span>
+            </div>
+            @if($crypto->high_24h && $crypto->low_24h)
+            <p class="text-xs text-slate-600 mt-1 tabular-nums">
+                H: ${{ number_format((float)$crypto->high_24h, (float)$crypto->high_24h >= 1 ? 2 : 6) }}
+                &nbsp;·&nbsp;
+                L: ${{ number_format((float)$crypto->low_24h, (float)$crypto->low_24h >= 1 ? 2 : 6) }}
+            </p>
+            @endif
+        </div>
+    </div>
+
+    {{-- Watchlist + compare actions --}}
+    <div class="flex flex-wrap gap-2 mb-6">
+        @auth
+        <form method="POST" action="{{ route('watchlist.toggle') }}">
+            @csrf
+            <input type="hidden" name="slug" value="{{ $crypto->slug }}">
+            <button class="flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:border-blue-500 hover:text-white transition">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                </svg>
+                Watchlist
+            </button>
+        </form>
+        @endauth
+
+        <a href="{{ route('crypto.compare', ['slugA' => $crypto->slug, 'slugB' => 'bitcoin']) }}"
+           class="flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:border-blue-500 hover:text-white transition">
+            ⚖️ vs Bitcoin
+        </a>
+        <a href="{{ route('crypto.compare', ['slugA' => $crypto->slug, 'slugB' => 'ethereum']) }}"
+           class="flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:border-blue-500 hover:text-white transition">
+            ⚖️ vs Ethereum
+        </a>
+    </div>
+
+    {{-- AI explanation --}}
+    @if (!empty($aiExplanation))
+    <div class="mb-6 rounded-xl border border-blue-800/40 bg-blue-950/30 p-4">
+        <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-blue-400">AI Analysis</p>
+        <p class="text-sm text-slate-300 leading-relaxed">{{ $aiExplanation }}</p>
+        <p class="mt-2 text-xs text-slate-600">Generated by AI · Not financial advice</p>
+    </div>
+    @endif
+
+    {{-- ── Chart ─────────────────────────────────────────────────────────── --}}
+    <div class="mb-6 rounded-xl border border-slate-800 bg-slate-900 overflow-hidden" id="chart-wrapper">
+        {{-- Chart toolbar --}}
+        <div class="flex items-center gap-3 border-b border-slate-800 px-4 py-2.5 flex-wrap">
+            {{-- Chart type toggle --}}
+            <div class="flex rounded-lg overflow-hidden border border-slate-700 text-xs">
+                <button id="type-area" onclick="setChartType('area')"
+                        class="px-3 py-1.5 bg-blue-600 text-white font-medium transition">Area</button>
+                <button id="type-candle" onclick="setChartType('candle')"
+                        class="px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition">Candle</button>
+            </div>
+
+            {{-- Timeframes --}}
+            <div class="flex gap-0.5 ml-auto flex-wrap">
+                @foreach(['1H','4H','1D','1W','1M','3M','1Y','ALL'] as $tf)
+                <button onclick="setTimeframe('{{ $tf }}')" id="tf-{{ $tf }}"
+                        class="tf-btn rounded-md px-2.5 py-1 text-xs font-medium text-slate-400 hover:bg-slate-700 hover:text-white transition {{ $tf === '1W' ? 'bg-slate-700 text-white' : '' }}">
+                    {{ $tf }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Crosshair info bar --}}
+        <div id="chart-info" class="flex items-center gap-4 px-4 py-1.5 text-xs text-slate-500 border-b border-slate-800/60 min-h-[28px]">
+            <span id="info-date"></span>
+            <span id="info-price" class="text-slate-300 font-medium tabular-nums"></span>
+            <span id="info-change" class="tabular-nums"></span>
+            <span id="info-vol" class="ml-auto tabular-nums"></span>
+        </div>
+
+        {{-- Price chart --}}
+        <div id="price-chart" class="h-[340px] w-full"></div>
+
+        {{-- Volume chart --}}
+        <div id="vol-chart" class="h-[80px] w-full border-t border-slate-800/40"></div>
+    </div>
+
+    {{-- Stats grid --}}
+    <div class="mb-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+        @php
+        $statItems = [
+            ['Market Cap',          $crypto->market_cap           ? '$'.number_format((float)$crypto->market_cap/1e9,2).'B'     : '—'],
+            ['24h Volume',          $crypto->total_volume         ? '$'.number_format((float)$crypto->total_volume/1e9,2).'B'   : '—'],
+            ['Circulating Supply',  $crypto->circulating_supply   ? number_format((float)$crypto->circulating_supply/1e6,2).'M '.e($crypto->symbol) : '—'],
+            ['Max Supply',          $crypto->max_supply           ? number_format((float)$crypto->max_supply/1e6,2).'M'         : '∞'],
+            ['24h High',            $crypto->high_24h             ? '$'.number_format((float)$crypto->high_24h, (float)$crypto->high_24h >= 1 ? 2 : 6) : '—'],
+            ['24h Low',             $crypto->low_24h              ? '$'.number_format((float)$crypto->low_24h, (float)$crypto->low_24h >= 1 ? 2 : 6)  : '—'],
+            ['All-Time High',       $crypto->ath                  ? '$'.number_format((float)$crypto->ath, (float)$crypto->ath >= 1 ? 2 : 6)           : '—'],
+            ['ATH Change',          $crypto->ath_change_percentage !== null ? number_format((float)$crypto->ath_change_percentage,2).'%' : '—'],
+            ['Rank',                $crypto->market_cap_rank      ? '#'.$crypto->market_cap_rank                                : '—'],
+        ];
+        @endphp
+        @foreach ($statItems as [$label, $value])
+        <div class="glass stat-card rounded-xl px-4 py-3">
+            <p class="text-xs text-slate-500 mb-0.5">{{ $label }}</p>
+            <p class="font-semibold text-white tabular-nums">{{ $value }}</p>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- Price change badges --}}
+    <div class="mb-6 glass rounded-xl px-6 py-4">
+        <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Price Change</p>
+        <div class="grid grid-cols-3 gap-4 text-center">
+            @foreach([
+                ['1h',  $crypto->price_change_percentage_1h_in_currency],
+                ['24h', $crypto->price_change_percentage_24h_in_currency],
+                ['7d',  $crypto->price_change_percentage_7d_in_currency]
+            ] as [$period, $val])
+            <div>
+                <p class="text-xs text-slate-500 mb-1.5">{{ $period }}</p>
+                @if ($val !== null) <x-percent-badge :value="$val" />
+                @else <span class="text-slate-600">—</span> @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Description --}}
+    @if ($crypto->description)
+    <div class="glass rounded-xl px-6 py-5">
+        <h2 class="mb-3 font-semibold text-white">About {{ e($crypto->name) }}</h2>
+        <div class="text-sm text-slate-400 leading-relaxed line-clamp-[12]" id="coin-desc">
+            {!! nl2br(e($crypto->description)) !!}
+        </div>
+        <button onclick="document.getElementById('coin-desc').classList.toggle('line-clamp-[12]')"
+                class="mt-2 text-xs text-blue-400 hover:underline">Show more / less</button>
+    </div>
+    @endif
+
+</div>
+
+{{-- ── Sidebar ───────────────────────────────────────────────────────────── --}}
+<aside class="mt-8 lg:mt-0 space-y-4">
+
+    @include('partials.affiliate-sidebar')
+
+    {{-- Price Alert --}}
+    @auth
+    <div class="glass rounded-xl p-4">
+        <p class="mb-3 text-sm font-semibold text-white">Set Price Alert</p>
+        @if (session('status'))
+            <p class="mb-2 text-xs text-emerald-400">{{ session('status') }}</p>
+        @endif
+        <form method="POST" action="{{ route('watchlist.alert.store') }}" class="space-y-3" aria-label="Create price alert">
+            @csrf
+            <input type="hidden" name="cryptocurrency_id" value="{{ $crypto->id }}">
+            <div>
+                <label for="alert-direction" class="sr-only">Alert direction</label>
+                <select id="alert-direction" name="direction"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 outline-none">
+                    <option value="above">Price goes above</option>
+                    <option value="below">Price goes below</option>
+                </select>
+            </div>
+            <div>
+                <label for="alert-price" class="block text-xs text-slate-500 mb-1">Target price (USD)</label>
+                <input id="alert-price" type="number" name="target_price" step="any" min="0"
+                       placeholder="{{ number_format((float)$crypto->current_price, 2) }}"
+                       class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 outline-none">
+            </div>
+            <button class="w-full rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">
+                Create Alert
+            </button>
+        </form>
+    </div>
+    @endauth
+
+    {{-- Quick links --}}
+    <div class="glass rounded-xl p-4">
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Explore</p>
+        <div class="space-y-1.5 text-sm">
+            <a href="{{ route('market.gainers') }}" class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+                <span>Top Gainers</span><span class="text-emerald-400">→</span>
+            </a>
+            <a href="{{ route('market.losers') }}" class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+                <span>Top Losers</span><span class="text-red-400">→</span>
+            </a>
+            <a href="{{ route('market.fear-greed') }}" class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+                <span>Fear &amp; Greed</span><span class="text-orange-400">→</span>
+            </a>
+            <a href="{{ route('market.bitcoin-dominance') }}" class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+                <span>BTC Dominance</span><span class="text-orange-400">→</span>
+            </a>
+        </div>
+    </div>
+
+    @include('partials.ad-rectangle', ['position' => 'coin-sidebar'])
+
+</aside>
+
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+// ── Live price Alpine component ───────────────────────────────────────────
+function coinDetail(slug, initialPrice, initialChange24h) {
+    return {
+        slug,
+        price:      initialPrice,
+        change24h:  initialChange24h,
+        flashClass: '',
+        _timer:     null,
+
+        init() {
+            this.$watch('$store.liveprices.prices', (prices) => {
+                const live = prices[this.slug];
+                if (!live) return;
+                const prev = this.price;
+                if (live.price !== prev) {
+                    const cls = live.price > prev ? 'flash-up' : 'flash-down';
+                    clearTimeout(this._timer);
+                    this.flashClass = cls;
+                    this._timer = setTimeout(() => { this.flashClass = ''; }, 1100);
+                    this.price     = live.price;
+                    this.change24h = live.change_24h;
+                }
+            }, { deep: true });
+        },
+
+        get formattedPrice() {
+            const p = this.price;
+            if (!p) return '$0.00';
+            if (p < 0.0001) return '$' + p.toFixed(8);
+            if (p < 0.01)   return '$' + p.toFixed(6);
+            if (p < 1)      return '$' + p.toFixed(4);
+            return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        get change24hColor() { return this.change24h >= 0 ? 'text-emerald-400' : 'text-red-400'; },
+        get change24hLabel() {
+            const sign = this.change24h >= 0 ? '▲' : '▼';
+            return `${sign} ${Math.abs(this.change24h).toFixed(2)}%`;
+        },
+    };
+}
+
+// ── Lightweight Charts setup ──────────────────────────────────────────────
+const COIN_SLUG = '{{ $crypto->slug }}';
+const CGBASE    = 'https://api.coingecko.com/api/v3';
+
+const TF_MAP = {
+    '1H':  { days: 1,      interval: 'minutely' },
+    '4H':  { days: 1,      interval: 'minutely' },
+    '1D':  { days: 1,      interval: 'hourly'   },
+    '1W':  { days: 7,      interval: 'hourly'   },
+    '1M':  { days: 30,     interval: 'daily'    },
+    '3M':  { days: 90,     interval: 'daily'    },
+    '1Y':  { days: 365,    interval: 'daily'    },
+    'ALL': { days: 'max',  interval: 'daily'    },
+};
+
+let priceChart, volChart, priceSeries, candleSeries, volSeries;
+let currentType = 'area';
+let currentTf   = '1W';
+let lastOhlc    = [];
+
+const CHART_OPTS = {
+    layout:    { background: { color: '#0f172a' }, textColor: '#64748b' },
+    grid:      { vertLines: { color: '#1e293b' }, horzLines: { color: '#1e293b' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: '#1e293b', scaleMargins: { top: 0.1, bottom: 0 } },
+    timeScale: { borderColor: '#1e293b', timeVisible: true, secondsVisible: false },
+    handleScroll: { mouseWheel: true, pressedMouseMove: true },
+    handleScale:  { mouseWheel: true, pinch: true },
+};
+
+function initCharts() {
+    const priceEl = document.getElementById('price-chart');
+    const volEl   = document.getElementById('vol-chart');
+
+    priceChart = LightweightCharts.createChart(priceEl, {
+        ...CHART_OPTS,
+        width: priceEl.clientWidth, height: 340,
+    });
+
+    volChart = LightweightCharts.createChart(volEl, {
+        layout:    { background: { color: '#0f172a' }, textColor: '#64748b' },
+        grid:      { vertLines: { color: '#1e293b' }, horzLines: { color: '#0f172a' } },
+        rightPriceScale: {
+            borderColor: '#1e293b',
+            scaleMargins: { top: 0.05, bottom: 0 },
+            drawTicks: false,
+        },
+        timeScale: { borderColor: '#1e293b', timeVisible: false, visible: false },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        width:  volEl.clientWidth,
+        height: 80,
+        handleScroll: false,
+        handleScale:  false,
+    });
+
+    // Sync crosshair + time scale between the two charts
+    priceChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+        if (range) volChart.timeScale().setVisibleLogicalRange(range);
+    });
+    volChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+        if (range) priceChart.timeScale().setVisibleLogicalRange(range);
+    });
+
+    priceSeries = priceChart.addAreaSeries({
+        lineColor:   '#3b82f6',
+        topColor:    'rgba(59,130,246,0.18)',
+        bottomColor: 'rgba(59,130,246,0)',
+        lineWidth: 2,
+    });
+
+    candleSeries = priceChart.addCandlestickSeries({
+        upColor:   '#10b981', downColor: '#ef4444',
+        borderUpColor: '#10b981', borderDownColor: '#ef4444',
+        wickUpColor: '#10b981', wickDownColor: '#ef4444',
+    });
+    candleSeries.applyOptions({ visible: false });
+
+    volSeries = volChart.addHistogramSeries({
+        color:    '#3b82f6',
+        priceFormat: { type: 'volume' },
+    });
+
+    // Crosshair info bar
+    priceChart.subscribeCrosshairMove(param => {
+        const infoDate  = document.getElementById('info-date');
+        const infoPrice = document.getElementById('info-price');
+        const infoCh    = document.getElementById('info-change');
+        const infoVol   = document.getElementById('info-vol');
+
+        if (!param.time) {
+            infoDate.textContent  = '';
+            infoPrice.textContent = '';
+            infoCh.textContent    = '';
+            infoVol.textContent   = '';
+            return;
+        }
+
+        const d    = new Date(param.time * 1000);
+        const dateStr = d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        infoDate.textContent = dateStr;
+
+        const priceData  = param.seriesData.get(priceSeries) ?? param.seriesData.get(candleSeries);
+        const volData    = param.seriesData.get(volSeries);
+
+        if (priceData) {
+            const p = priceData.value ?? priceData.close;
+            const o = priceData.open ?? p;
+            const chg = o > 0 ? ((p - o) / o * 100) : 0;
+            infoPrice.textContent = '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+            infoCh.textContent    = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+            infoCh.className      = chg >= 0 ? 'text-emerald-400 tabular-nums' : 'text-red-400 tabular-nums';
+        }
+        if (volData) {
+            const v = volData.value;
+            infoVol.textContent = 'Vol: $' + (v >= 1e9 ? (v/1e9).toFixed(2)+'B' : v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v.toFixed(0));
+        }
+    });
+
+    const obs = new ResizeObserver(() => {
+        priceChart.applyOptions({ width: priceEl.clientWidth });
+        volChart.applyOptions({ width: volEl.clientWidth });
+    });
+    obs.observe(priceEl);
+}
+
+async function setTimeframe(tf) {
+    currentTf = tf;
+    document.querySelectorAll('.tf-btn').forEach(b => {
+        b.classList.remove('bg-slate-700', 'text-white');
+        b.classList.add('text-slate-400');
+    });
+    const btn = document.getElementById('tf-' + tf);
+    if (btn) { btn.classList.add('bg-slate-700', 'text-white'); btn.classList.remove('text-slate-400'); }
+
+    const cfg = TF_MAP[tf];
+    try {
+        // Fetch price + volume data
+        const [mktResp, ohlcResp] = await Promise.all([
+            fetch(`${CGBASE}/coins/${COIN_SLUG}/market_chart?vs_currency=usd&days=${cfg.days}&interval=${cfg.interval}`),
+            currentType === 'candle'
+                ? fetch(`${CGBASE}/coins/${COIN_SLUG}/ohlc?vs_currency=usd&days=${cfg.days === 'max' ? 365 : cfg.days}`)
+                : Promise.resolve(null),
+        ]);
+
+        const mkt = await mktResp.json();
+
+        const prices  = (mkt.prices   || []).map(p => ({ time: Math.floor(p[0] / 1000), value: p[1] }));
+        const volumes = (mkt.total_volumes || []).map(v => {
+            const close = (mkt.prices || []).find(p => Math.abs(p[0] - v[0]) < 3600000);
+            const isUp  = close ? (close[1] >= (mkt.prices[Math.max(0, mkt.prices.indexOf(close)-1)]?.[1] ?? close[1])) : true;
+            return { time: Math.floor(v[0] / 1000), value: v[1], color: isUp ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)' };
+        });
+
+        if (currentType === 'area') {
+            priceSeries.setData(prices);
+            // Update line color based on overall change
+            const first = prices[0]?.value ?? 0;
+            const last  = prices[prices.length - 1]?.value ?? 0;
+            const up    = last >= first;
+            priceSeries.applyOptions({
+                lineColor:   up ? '#10b981' : '#ef4444',
+                topColor:    up ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.1)',
+                bottomColor: 'rgba(0,0,0,0)',
+            });
+        } else if (ohlcResp) {
+            const ohlc = await ohlcResp.json();
+            lastOhlc   = (ohlc || []).map(c => ({
+                time:  Math.floor(c[0] / 1000),
+                open:  c[1], high: c[2], low: c[3], close: c[4],
+            }));
+            candleSeries.setData(lastOhlc);
+        }
+
+        volSeries.setData(volumes);
+        priceChart.timeScale().fitContent();
+        volChart.timeScale().fitContent();
+    } catch (err) {
+        console.warn('[Chart] Fetch error:', err.message);
+    }
+}
+
+function setChartType(type) {
+    currentType = type;
+    document.getElementById('type-area').className   = type === 'area'   ? 'px-3 py-1.5 bg-blue-600 text-white font-medium transition' : 'px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition';
+    document.getElementById('type-candle').className = type === 'candle' ? 'px-3 py-1.5 bg-blue-600 text-white font-medium transition' : 'px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition';
+    priceSeries.applyOptions({ visible: type === 'area' });
+    candleSeries.applyOptions({ visible: type === 'candle' });
+    setTimeframe(currentTf);
+}
+
+// Add live price tick to the area series
+function pushLiveTick(price) {
+    if (currentType !== 'area') return;
+    const now = Math.floor(Date.now() / 1000);
+    try { priceSeries.update({ time: now, value: price }); } catch (_) {}
+}
+
+initCharts();
+setTimeframe('1W');
+
+// Push Binance live ticks into the chart
+(function watchLiveTicks() {
+    let lastPush = 0;
+    setInterval(() => {
+        const store = globalThis.Alpine?.store('liveprices');
+        if (!store) return;
+        const live = store.prices[COIN_SLUG];
+        if (!live || live.ts === lastPush) return;
+        lastPush = live.ts;
+        pushLiveTick(live.price);
+    }, 2000); // push chart tick every 2s max
+})();
+</script>
+@endpush
