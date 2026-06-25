@@ -1,5 +1,8 @@
+@php $isRtl = app()->getLocale() === 'ar'; @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      class="dark"
+      @if($isRtl) dir="rtl" @endif>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,9 +35,24 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    @if($isRtl)
+        {{-- Cairo for Arabic — excellent readability for RTL --}}
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    @else
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if($isRtl)
+    <style>
+        body, * { font-family: 'Cairo', 'Segoe UI', sans-serif !important; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Flip padding for RTL nav */
+        .rtl-flip { transform: scaleX(-1); }
+    </style>
+    @endif
+
     @stack('head')
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased"
@@ -47,7 +65,7 @@
 {{-- ── Navbar ─────────────────────────────────────────────────────────────── --}}
 <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-md">
     <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between gap-4">
+        <div class="flex h-16 items-center justify-between gap-3">
 
             {{-- Logo --}}
             <a href="{{ route('crypto.index') }}" class="flex items-center gap-2.5 shrink-0 group">
@@ -61,60 +79,99 @@
             </a>
 
             {{-- Search --}}
-            <form method="GET" action="{{ route('crypto.index') }}" class="flex-1 max-w-sm hidden sm:block" role="search" aria-label="Search cryptocurrencies">
+            <form method="GET" action="{{ route('crypto.index') }}"
+                  class="flex-1 max-w-sm hidden sm:block"
+                  role="search"
+                  aria-label="{{ __('nav.search_placeholder') }}">
                 <div class="relative">
-                    <label for="global-search" class="sr-only">Search cryptocurrency</label>
-                    <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <label for="global-search" class="sr-only">{{ __('common.search') }}</label>
+                    <svg class="pointer-events-none absolute {{ $isRtl ? 'right-3' : 'left-3' }} top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
                     </svg>
                     <input id="global-search" type="search" name="search" value="{{ request('search') }}"
-                           placeholder="Search 250+ cryptos…" autocomplete="off"
-                           class="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 py-2 pl-10 pr-4 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/80 focus:bg-slate-800 focus:ring-1 focus:ring-blue-500/40 transition-all">
+                           placeholder="{{ __('nav.search_placeholder') }}" autocomplete="off"
+                           class="w-full rounded-lg border border-slate-700/60 bg-slate-800/60 py-2 {{ $isRtl ? 'pr-10 pl-4' : 'pl-10 pr-4' }} text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500/80 focus:bg-slate-800 focus:ring-1 focus:ring-blue-500/40 transition-all">
                 </div>
             </form>
 
             {{-- Desktop nav --}}
             <nav class="hidden lg:flex items-center gap-1 text-sm text-slate-400" aria-label="Main navigation">
-                <a href="{{ route('crypto.index') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.index') ? 'bg-slate-800 text-white' : '' }}">Market</a>
-                <a href="{{ route('market.gainers') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.gainers') ? 'bg-slate-800 text-white' : '' }}">Gainers</a>
-                <a href="{{ route('market.losers') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.losers') ? 'bg-slate-800 text-white' : '' }}">Losers</a>
-                <a href="{{ route('market.trending') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.trending') ? 'bg-slate-800 text-white' : '' }}">Trending</a>
-                <a href="{{ route('market.fear-greed') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.fear-greed') ? 'bg-slate-800 text-white' : '' }}">F&G Index</a>
-                <a href="{{ route('news.index') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">News</a>
+                <a href="{{ route('crypto.index') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.index') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.market') }}
+                </a>
+                <a href="{{ route('market.gainers') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.gainers') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.gainers') }}
+                </a>
+                <a href="{{ route('market.losers') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.losers') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.losers') }}
+                </a>
+                <a href="{{ route('market.trending') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.trending') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.trending') }}
+                </a>
+                <a href="{{ route('market.fear-greed') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.fear-greed') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.fear_greed') }}
+                </a>
+                <a href="{{ route('news.index') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.news') }}
+                </a>
                 @auth
-                    <a href="{{ route('watchlist.index') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('watchlist.*') ? 'bg-slate-800 text-white' : '' }}">
-                        <svg class="inline-block h-4 w-4 -mt-0.5 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                        Watchlist
+                    <a href="{{ route('watchlist.index') }}"
+                       class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('watchlist.*') ? 'bg-slate-800 text-white' : '' }}">
+                        <svg class="inline-block h-4 w-4 -mt-0.5 {{ $isRtl ? 'ml-1' : 'mr-0.5' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                        </svg>
+                        {{ __('nav.watchlist') }}
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
-                        <button class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">Logout</button>
+                        <button class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                            {{ __('nav.logout') }}
+                        </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">Login</a>
-                    <a href="{{ route('register') }}" class="ml-1 rounded-lg bg-blue-600 px-4 py-1.5 text-white text-sm font-semibold hover:bg-blue-500 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">Sign up</a>
+                    <a href="{{ route('login') }}"
+                       class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
+                        {{ __('nav.login') }}
+                    </a>
+                    <a href="{{ route('register') }}"
+                       class="{{ $isRtl ? 'mr-1' : 'ml-1' }} rounded-lg bg-blue-600 px-4 py-1.5 text-white text-sm font-semibold hover:bg-blue-500 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
+                        {{ __('nav.register') }}
+                    </a>
                 @endauth
             </nav>
 
-            {{-- Live badge + mobile menu button --}}
-            <div class="flex items-center gap-3">
+            {{-- Right side: Live badge + lang switcher + mobile menu --}}
+            <div class="flex items-center gap-2 shrink-0">
+
+                {{-- LIVE indicator --}}
                 <div x-show="$store.liveprices.connected" x-cloak
                      class="hidden sm:flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-400">
                     <span class="relative flex h-1.5 w-1.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                     </span>
-                    LIVE
+                    {{ __('common.live') }}
                 </div>
+
+                {{-- Language switcher --}}
+                @include('partials.language-switcher')
 
                 {{-- Mobile menu toggle --}}
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                         class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-                        aria-label="Toggle menu">
-                    <svg x-show="!mobileMenuOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        :aria-expanded="mobileMenuOpen"
+                        aria-label="{{ __('nav.toggle_menu') }}">
+                    <svg x-show="!mobileMenuOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
-                    <svg x-show="mobileMenuOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg x-show="mobileMenuOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
@@ -133,28 +190,45 @@
          class="lg:hidden border-t border-slate-800 bg-slate-950 px-4 py-3">
 
         {{-- Mobile search --}}
-        <form method="GET" action="{{ route('crypto.index') }}" class="mb-3" role="search" aria-label="Mobile search">
-            <label for="mobile-search" class="sr-only">Search</label>
+        <form method="GET" action="{{ route('crypto.index') }}" class="mb-3"
+              role="search" aria-label="{{ __('nav.search_placeholder') }}">
+            <label for="mobile-search" class="sr-only">{{ __('common.search') }}</label>
             <input id="mobile-search" type="search" name="search" value="{{ request('search') }}"
-                   placeholder="Search crypto…"
+                   placeholder="{{ __('nav.search_placeholder') }}"
                    class="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-blue-500">
         </form>
 
-        <nav class="grid grid-cols-2 gap-1 text-sm" aria-label="Mobile navigation">
-            <a href="{{ route('crypto.index') }}"      class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Market</a>
-            <a href="{{ route('market.gainers') }}"    class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Gainers</a>
-            <a href="{{ route('market.losers') }}"     class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Losers</a>
-            <a href="{{ route('market.trending') }}"   class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Trending</a>
-            <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Fear & Greed</a>
+        <nav class="grid grid-cols-2 gap-1 text-sm mb-3" aria-label="Mobile navigation">
+            <a href="{{ route('crypto.index') }}"      class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.market') }}</a>
+            <a href="{{ route('market.gainers') }}"    class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.gainers') }}</a>
+            <a href="{{ route('market.losers') }}"     class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.losers') }}</a>
+            <a href="{{ route('market.trending') }}"   class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.trending') }}</a>
+            <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
             <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
-            <a href="{{ route('news.index') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">News</a>
+            <a href="{{ route('news.index') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.news') }}</a>
             @auth
-                <a href="{{ route('watchlist.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Watchlist</a>
+                <a href="{{ route('watchlist.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.watchlist') }}</a>
             @else
-                <a href="{{ route('login') }}"           class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">Login</a>
-                <a href="{{ route('register') }}"        class="px-3 py-2 rounded-lg bg-blue-600 text-white text-center">Sign up</a>
+                <a href="{{ route('login') }}"           class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.login') }}</a>
+                <a href="{{ route('register') }}"        class="px-3 py-2 rounded-lg bg-blue-600 text-white text-center">{{ __('nav.register') }}</a>
             @endauth
         </nav>
+
+        {{-- Mobile language switcher --}}
+        <div class="border-t border-slate-800 pt-3">
+            <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('lang.label') }}</p>
+            <div class="flex flex-wrap gap-1.5">
+                @foreach(['en'=>['🇬🇧','EN'],'fr'=>['🇫🇷','FR'],'ar'=>['🇸🇦','AR'],'es'=>['🇪🇸','ES'],'de'=>['🇩🇪','DE'],'pt'=>['🇧🇷','PT']] as $code=>[$flag,$short])
+                <a href="{{ route('locale.switch', $code) }}"
+                   class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
+                          {{ app()->getLocale() === $code
+                             ? 'border-blue-600 bg-blue-600/20 text-blue-400'
+                             : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white' }}">
+                    <span>{{ $flag }}</span><span>{{ $short }}</span>
+                </a>
+                @endforeach
+            </div>
+        </div>
     </div>
 
     @include('partials.ad-leaderboard')
@@ -172,55 +246,56 @@
 <footer class="border-t border-slate-800/60 bg-slate-950 pt-10 pb-6 text-slate-500">
     <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
+
             {{-- Brand --}}
             <div class="col-span-2 md:col-span-1">
                 <a href="{{ route('crypto.index') }}" class="flex items-center gap-2 mb-3">
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 font-bold text-white text-sm">CI</div>
                     <span class="font-bold text-white">CryptoInfo</span>
                 </a>
-                <p class="text-xs leading-relaxed mb-3">Real-time cryptocurrency market intelligence. Accurate, fast, trusted.</p>
+                <p class="text-xs leading-relaxed mb-3">{{ __('footer.tagline') }}</p>
                 <div class="flex items-center gap-1.5 text-xs text-emerald-400">
                     <span class="relative flex h-1.5 w-1.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                     </span>
-                    Live data · Updated every 10 min
+                    {{ __('footer.live_data') }}
                 </div>
             </div>
 
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Market</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.market') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('market.gainers') }}"          class="hover:text-white transition">Top Gainers</a></li>
-                    <li><a href="{{ route('market.losers') }}"           class="hover:text-white transition">Top Losers</a></li>
-                    <li><a href="{{ route('market.trending') }}"         class="hover:text-white transition">Trending</a></li>
-                    <li><a href="{{ route('market.fear-greed') }}"       class="hover:text-white transition">Fear & Greed</a></li>
-                    <li><a href="{{ route('market.bitcoin-dominance') }}" class="hover:text-white transition">BTC Dominance</a></li>
-                    <li><a href="{{ route('market.global-cap') }}"       class="hover:text-white transition">Market Cap</a></li>
+                    <li><a href="{{ route('market.gainers') }}"           class="hover:text-white transition">{{ __('footer.top_gainers') }}</a></li>
+                    <li><a href="{{ route('market.losers') }}"            class="hover:text-white transition">{{ __('footer.top_losers') }}</a></li>
+                    <li><a href="{{ route('market.trending') }}"          class="hover:text-white transition">{{ __('footer.trending') }}</a></li>
+                    <li><a href="{{ route('market.fear-greed') }}"        class="hover:text-white transition">{{ __('footer.fear_greed') }}</a></li>
+                    <li><a href="{{ route('market.bitcoin-dominance') }}" class="hover:text-white transition">{{ __('footer.btc_dominance') }}</a></li>
+                    <li><a href="{{ route('market.global-cap') }}"        class="hover:text-white transition">{{ __('footer.market_cap') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Content</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.content') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('news.index') }}"    class="hover:text-white transition">Crypto News</a></li>
-                    <li><a href="{{ route('api.docs') }}"      class="hover:text-white transition">API Docs</a></li>
+                    <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
+                    <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Company</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.company') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('pages.about') }}"       class="hover:text-white transition">About Us</a></li>
-                    <li><a href="{{ route('pages.methodology') }}" class="hover:text-white transition">Our Data</a></li>
-                    <li><a href="{{ route('pages.contact') }}"     class="hover:text-white transition">Contact</a></li>
-                    <li><a href="{{ route('pages.privacy') }}"     class="hover:text-white transition">Privacy</a></li>
-                    <li><a href="{{ route('pages.terms') }}"       class="hover:text-white transition">Terms</a></li>
+                    <li><a href="{{ route('pages.about') }}"       class="hover:text-white transition">{{ __('footer.about') }}</a></li>
+                    <li><a href="{{ route('pages.methodology') }}" class="hover:text-white transition">{{ __('footer.methodology') }}</a></li>
+                    <li><a href="{{ route('pages.contact') }}"     class="hover:text-white transition">{{ __('footer.contact') }}</a></li>
+                    <li><a href="{{ route('pages.privacy') }}"     class="hover:text-white transition">{{ __('footer.privacy') }}</a></li>
+                    <li><a href="{{ route('pages.terms') }}"       class="hover:text-white transition">{{ __('footer.terms') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Trade</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.trade') }}</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="https://www.binance.com/en/register?ref=CRYPTOINFO" target="_blank" rel="noopener sponsored" class="hover:text-yellow-400 transition">Binance ↗</a></li>
                     <li><a href="https://www.bybit.com/en/register?affiliate_id=CRYPTOINFO" target="_blank" rel="noopener sponsored" class="hover:text-orange-400 transition">Bybit ↗</a></li>
@@ -232,17 +307,29 @@
         {{-- Trust badges --}}
         <div class="border-t border-slate-800/60 pt-6 mb-4">
             <div class="flex flex-wrap justify-center gap-4 text-xs text-slate-600">
-                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> Real-Time Data</span>
-                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> CoinGecko Verified</span>
-                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> 250+ Cryptocurrencies</span>
-                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> Free & No Registration</span>
-                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> Transparent Methodology</span>
+                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> {{ __('trust.realtime') }}</span>
+                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> {{ __('trust.coingecko') }}</span>
+                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> {{ __('trust.coins') }}</span>
+                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> {{ __('trust.free') }}</span>
+                <span class="flex items-center gap-1.5"><span class="text-emerald-500">✓</span> {{ __('trust.transparent') }}</span>
             </div>
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-600">
-            <p>Data by <a href="https://www.coingecko.com" target="_blank" rel="noopener" class="text-blue-500 hover:text-blue-400">CoinGecko</a> &amp; <a href="https://alternative.me" target="_blank" rel="noopener" class="text-blue-500 hover:text-blue-400">Alternative.me</a> &nbsp;·&nbsp; &copy; {{ date('Y') }} CryptoInfo. Not financial advice.</p>
-            <p><a href="/sitemap.xml" class="hover:text-slate-400">Sitemap</a> &nbsp;·&nbsp; <a href="/robots.txt" class="hover:text-slate-400">Robots</a></p>
+            <p>
+                {{ __('footer.data_by') }}
+                <a href="https://www.coingecko.com" target="_blank" rel="noopener" class="text-blue-500 hover:text-blue-400">CoinGecko</a>
+                &amp;
+                <a href="https://alternative.me" target="_blank" rel="noopener" class="text-blue-500 hover:text-blue-400">Alternative.me</a>
+                &nbsp;·&nbsp;
+                {{ str_replace(':year', date('Y'), __('footer.copyright')) }}
+                {{ __('footer.not_financial') }}.
+            </p>
+            <p>
+                <a href="/sitemap.xml" class="hover:text-slate-400">{{ __('footer.sitemap') }}</a>
+                &nbsp;·&nbsp;
+                <a href="/robots.txt" class="hover:text-slate-400">{{ __('footer.robots') }}</a>
+            </p>
         </div>
     </div>
 </footer>

@@ -55,8 +55,14 @@ class CryptoApiService
     public function fetchMarkets(int $page = 1, int $perPage = 250): array
     {
         try {
+            $apiKey = config('services.coingecko.api_key', '');
+            $headers = ['User-Agent' => 'CryptoInfo/1.0 (contact@cryptoinfo.dev)', 'Accept' => 'application/json'];
+            if ($apiKey) {
+                $headers['x-cg-demo-api-key'] = $apiKey;
+            }
             $response = Http::timeout(15)
                 ->retry(2, 1000)
+                ->withHeaders($headers)
                 ->get("{$this->baseUrl}/coins/markets", [
                     'vs_currency'            => 'usd',
                     'order'                  => 'market_cap_desc',
@@ -89,7 +95,13 @@ class CryptoApiService
     public function fetchCoinDetail(string $id): array
     {
         try {
+            $apiKey2  = config('services.coingecko.api_key', '');
+            $headers2 = ['User-Agent' => 'CryptoInfo/1.0 (contact@cryptoinfo.dev)', 'Accept' => 'application/json'];
+            if ($apiKey2) {
+                $headers2['x-cg-demo-api-key'] = $apiKey2;
+            }
             $response = Http::timeout(15)
+                ->withHeaders($headers2)
                 ->get("{$this->baseUrl}/coins/{$id}", [
                     'localization'   => 'false',
                     'tickers'        => 'false',

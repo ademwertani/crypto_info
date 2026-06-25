@@ -12,19 +12,19 @@
 
 <div class="mb-5 flex items-end justify-between gap-4 flex-wrap">
     <div>
-        <h2 class="text-xl font-bold text-white">Today's Cryptocurrency Prices</h2>
+        <h2 class="text-xl font-bold text-white">{{ __('market.today_prices') }}</h2>
         <p class="text-sm text-slate-400 mt-0.5">
-            Showing {{ $cryptos->firstItem() }}–{{ $cryptos->lastItem() }} of {{ number_format($cryptos->total()) }} assets
+            {{ str_replace([':first',':last',':total'], [$cryptos->firstItem(), $cryptos->lastItem(), number_format($cryptos->total())], __('market.showing')) }}
             &nbsp;·&nbsp;
             <span x-show="$store.liveprices.binanceConnected" x-cloak class="inline-flex items-center gap-1 text-emerald-400">
                 <span class="relative flex h-1.5 w-1.5">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                 </span>
-                Live via Binance
+                {{ __('market.live_binance') }}
             </span>
-            <span x-show="!$store.liveprices.binanceConnected && $store.liveprices.reverbConnected" x-cloak class="text-blue-400">Live</span>
-            <span x-show="!$store.liveprices.connected" x-cloak class="text-slate-500">Synced every 10 min</span>
+            <span x-show="!$store.liveprices.binanceConnected && $store.liveprices.reverbConnected" x-cloak class="text-blue-400">{{ __('common.live') }}</span>
+            <span x-show="!$store.liveprices.connected" x-cloak class="text-slate-500">{{ __('market.synced') }}</span>
         </p>
     </div>
     <div class="flex items-center gap-2 flex-wrap shrink-0">
@@ -59,15 +59,15 @@
         <thead>
             <tr class="border-b border-slate-800 bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-500">
                 <th scope="col" class="px-4 py-3 text-right w-10">#</th>
-                <th scope="col" class="px-4 py-3 text-left min-w-[180px]">Name</th>
-                <th scope="col" class="px-4 py-3 text-right">Price</th>
-                <th scope="col" class="px-4 py-3 text-right w-16">1h %</th>
-                <th scope="col" class="px-4 py-3 text-right w-16">24h %</th>
-                <th scope="col" class="px-4 py-3 text-right w-16">7d %</th>
-                <th scope="col" class="px-4 py-3 text-right min-w-[110px]">Market Cap</th>
-                <th scope="col" class="px-4 py-3 text-right min-w-[110px]">Volume (24h)</th>
-                <th scope="col" class="hidden lg:table-cell px-4 py-3 text-center w-24">7d Chart</th>
-                <th scope="col" class="hidden xl:table-cell px-4 py-3 text-center w-16">Compare</th>
+                <th scope="col" class="px-4 py-3 text-left min-w-[180px]">{{ __('table.name') }}</th>
+                <th scope="col" class="px-4 py-3 text-right">{{ __('table.price') }}</th>
+                <th scope="col" class="px-4 py-3 text-right w-16">{{ __('table.1h') }}</th>
+                <th scope="col" class="px-4 py-3 text-right w-16">{{ __('table.24h') }}</th>
+                <th scope="col" class="px-4 py-3 text-right w-16">{{ __('table.7d') }}</th>
+                <th scope="col" class="px-4 py-3 text-right min-w-[110px]">{{ __('table.market_cap') }}</th>
+                <th scope="col" class="px-4 py-3 text-right min-w-[110px]">{{ __('table.volume') }}</th>
+                <th scope="col" class="hidden lg:table-cell px-4 py-3 text-center w-24">{{ __('table.chart_7d') }}</th>
+                <th scope="col" class="hidden xl:table-cell px-4 py-3 text-center w-16">{{ __('table.compare') }}</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-800/50">

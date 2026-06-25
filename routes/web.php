@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\NewsController;
@@ -11,6 +12,11 @@ use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Spatie\Sitemap\SitemapGenerator;
+
+// ── Language switcher ───────────────────────────────────────────────────────
+Route::get('/lang/{locale}', [LocaleController::class, 'switch'])
+    ->where('locale', 'en|fr|ar|es|de|pt')
+    ->name('locale.switch');
 
 // ── Homepage ────────────────────────────────────────────────────────────────
 Route::get('/', [CryptoController::class, 'index'])->name('crypto.index');

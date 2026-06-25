@@ -28,7 +28,7 @@
             <span class="text-slate-600 mx-3 font-light">vs</span>
             <a href="{{ route('crypto.show', $b->slug) }}" class="hover:text-blue-400 transition">{{ $b->name }}</a>
         </h1>
-        <p class="text-slate-400 text-sm">Live price comparison · Powered by CoinGecko</p>
+        <p class="text-slate-400 text-sm">{{ __('compare.subtitle') }}</p>
     </div>
 
     {{-- Live price cards --}}
@@ -85,11 +85,11 @@
             <div class="flex rounded-lg overflow-hidden border border-slate-700 text-xs">
                 <button id="mode-overlay" onclick="setMode('overlay')"
                         class="px-3 py-1.5 bg-blue-600 text-white font-medium transition">
-                    % Return (overlay)
+                    {{ __('compare.overlay') }}
                 </button>
                 <button id="mode-dual" onclick="setMode('dual')"
                         class="px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition">
-                    Dual Price
+                    {{ __('compare.dual_price') }}
                 </button>
             </div>
 
@@ -130,16 +130,16 @@
     {{-- Metrics comparison table --}}
     <div class="glass rounded-2xl overflow-hidden mb-6 animate-fade-in-delay-3">
         <div class="px-5 py-3.5 border-b border-slate-800/60">
-            <h2 class="font-semibold text-white text-sm">Side-by-Side Metrics</h2>
+            <h2 class="font-semibold text-white text-sm">{{ __('compare.side_by_side') }}</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-800/50">
-                        <th class="px-5 py-2.5 text-left w-40">Metric</th>
+                        <th class="px-5 py-2.5 text-left w-40">{{ __('compare.metric') }}</th>
                         <th class="px-5 py-2.5 text-right text-blue-400">{{ $a->name }}</th>
                         <th class="px-5 py-2.5 text-right text-purple-400">{{ $b->name }}</th>
-                        <th class="px-5 py-2.5 text-right w-24">Edge</th>
+                        <th class="px-5 py-2.5 text-right w-24">{{ __('compare.edge') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800/40">
@@ -219,13 +219,13 @@
                         <td class="px-5 py-3 text-right font-semibold tabular-nums {{ $row['classA'] }}">
                             {{ $row['valA'] }}
                             @if(($row['winner']??null) === 'A')
-                                <span class="ml-1.5 inline-flex items-center rounded bg-emerald-900/50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 border border-emerald-800/40">BETTER</span>
+                                <span class="ml-1.5 inline-flex items-center rounded bg-emerald-900/50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 border border-emerald-800/40">{{ __('compare.better') }}</span>
                             @endif
                         </td>
                         <td class="px-5 py-3 text-right font-semibold tabular-nums {{ $row['classB'] }}">
                             {{ $row['valB'] }}
                             @if(($row['winner']??null) === 'B')
-                                <span class="ml-1.5 inline-flex items-center rounded bg-emerald-900/50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 border border-emerald-800/40">BETTER</span>
+                                <span class="ml-1.5 inline-flex items-center rounded bg-emerald-900/50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 border border-emerald-800/40">{{ __('compare.better') }}</span>
                             @endif
                         </td>
                         <td class="px-5 py-3 text-right text-xs">
@@ -246,7 +246,7 @@
 
     {{-- Try other comparisons --}}
     <div class="glass rounded-xl p-5">
-        <h2 class="text-sm font-semibold text-white mb-3">Try other comparisons</h2>
+        <h2 class="text-sm font-semibold text-white mb-3">{{ __('compare.try_other') }}</h2>
         <div class="flex flex-wrap gap-2">
             @foreach(['bitcoin','ethereum','solana','binancecoin','ripple','cardano','dogecoin','avalanche-2','polkadot','chainlink'] as $slug)
                 @if($slug !== $a->slug)
@@ -269,28 +269,30 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"
+        integrity="sha384-OK7vELvjHdhUFi31JYioPIcRHTROLdcDa6ZsNWgvgLaKj+9JqhU0Ad8g4wz3CXjA"
+        crossorigin="anonymous"></script>
 <script>
 // ── Alpine: live prices for both coins ───────────────────────────────────
 function compareCoins(slugA, initPriceA, initChgA, slugB, initPriceB, initChgB) {
     return {
-        slugA, priceA: initPriceA, chgA: initChgA, flashA: '',
-        slugB, priceB: initPriceB, chgB: initChgB, flashB: '',
+        slugA, _priceA: initPriceA, _chgA: initChgA, flashA: '',
+        slugB, _priceB: initPriceB, _chgB: initChgB, flashB: '',
         _timerA: null, _timerB: null,
 
         init() {
             this.$watch('$store.liveprices.prices', prices => {
                 const la = prices[this.slugA];
-                if (la && la.price !== this.priceA) {
-                    this._doFlash('A', la.price > this.priceA);
-                    this.priceA = la.price;
-                    this.chgA   = la.change_24h;
+                if (la && la.price !== this._priceA) {
+                    this._doFlash('A', la.price > this._priceA);
+                    this._priceA = la.price;
+                    this._chgA   = la.change_24h;
                 }
                 const lb = prices[this.slugB];
-                if (lb && lb.price !== this.priceB) {
-                    this._doFlash('B', lb.price > this.priceB);
-                    this.priceB = lb.price;
-                    this.chgB   = lb.change_24h;
+                if (lb && lb.price !== this._priceB) {
+                    this._doFlash('B', lb.price > this._priceB);
+                    this._priceB = lb.price;
+                    this._chgB   = lb.change_24h;
                 }
             }, { deep: true });
         },
@@ -315,21 +317,12 @@ function compareCoins(slugA, initPriceA, initChgA, slugB, initPriceB, initChgB) 
             return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         },
 
-        get priceA() { return this._priceA ?? 0; },
-        set priceA(v) { this._priceA = v; },
-        get formattedA() { return this._fmt(this._priceA); },
-
-        get priceB() { return this._priceB ?? 0; },
-        set priceB(v) { this._priceB = v; },
-        get formattedB() { return this._fmt(this._priceB); },
-
-        // x-text bindings
-        get priceA()   { return this._fmt(this._priceA ?? initPriceA); },
-        get priceB()   { return this._fmt(this._priceB ?? initPriceB); },
-        get chgLabelA(){ const c = this._chgA ?? initChgA; return (c>=0?'▲ +':'▼ ')+Math.abs(c).toFixed(2)+'%'; },
-        get chgLabelB(){ const c = this._chgB ?? initChgB; return (c>=0?'▲ +':'▼ ')+Math.abs(c).toFixed(2)+'%'; },
-        get chgColorA(){ return (this._chgA??initChgA)>=0?'text-emerald-400':'text-red-400'; },
-        get chgColorB(){ return (this._chgB??initChgB)>=0?'text-emerald-400':'text-red-400'; },
+        get priceA()   { return this._fmt(this._priceA); },
+        get priceB()   { return this._fmt(this._priceB); },
+        get chgLabelA(){ return (this._chgA >= 0 ? '▲ +' : '▼ ') + Math.abs(this._chgA).toFixed(2) + '%'; },
+        get chgLabelB(){ return (this._chgB >= 0 ? '▲ +' : '▼ ') + Math.abs(this._chgB).toFixed(2) + '%'; },
+        get chgColorA(){ return this._chgA >= 0 ? 'text-emerald-400' : 'text-red-400'; },
+        get chgColorB(){ return this._chgB >= 0 ? 'text-emerald-400' : 'text-red-400'; },
     };
 }
 

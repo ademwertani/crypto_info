@@ -108,9 +108,9 @@
             {{-- Chart type toggle --}}
             <div class="flex rounded-lg overflow-hidden border border-slate-700 text-xs">
                 <button id="type-area" onclick="setChartType('area')"
-                        class="px-3 py-1.5 bg-blue-600 text-white font-medium transition">Area</button>
+                        class="px-3 py-1.5 bg-blue-600 text-white font-medium transition">{{ __('chart.area') }}</button>
                 <button id="type-candle" onclick="setChartType('candle')"
-                        class="px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition">Candle</button>
+                        class="px-3 py-1.5 text-slate-400 hover:bg-slate-700 hover:text-white transition">{{ __('chart.candle') }}</button>
             </div>
 
             {{-- Timeframes --}}
@@ -143,15 +143,15 @@
     <div class="mb-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
         @php
         $statItems = [
-            ['Market Cap',          $crypto->market_cap           ? '$'.number_format((float)$crypto->market_cap/1e9,2).'B'     : '—'],
-            ['24h Volume',          $crypto->total_volume         ? '$'.number_format((float)$crypto->total_volume/1e9,2).'B'   : '—'],
-            ['Circulating Supply',  $crypto->circulating_supply   ? number_format((float)$crypto->circulating_supply/1e6,2).'M '.e($crypto->symbol) : '—'],
-            ['Max Supply',          $crypto->max_supply           ? number_format((float)$crypto->max_supply/1e6,2).'M'         : '∞'],
-            ['24h High',            $crypto->high_24h             ? '$'.number_format((float)$crypto->high_24h, (float)$crypto->high_24h >= 1 ? 2 : 6) : '—'],
-            ['24h Low',             $crypto->low_24h              ? '$'.number_format((float)$crypto->low_24h, (float)$crypto->low_24h >= 1 ? 2 : 6)  : '—'],
-            ['All-Time High',       $crypto->ath                  ? '$'.number_format((float)$crypto->ath, (float)$crypto->ath >= 1 ? 2 : 6)           : '—'],
-            ['ATH Change',          $crypto->ath_change_percentage !== null ? number_format((float)$crypto->ath_change_percentage,2).'%' : '—'],
-            ['Rank',                $crypto->market_cap_rank      ? '#'.$crypto->market_cap_rank                                : '—'],
+            [__('stats.market_cap'),  $crypto->market_cap           ? '$'.number_format((float)$crypto->market_cap/1e9,2).'B'     : '—'],
+            [__('stats.volume_24h'),  $crypto->total_volume         ? '$'.number_format((float)$crypto->total_volume/1e9,2).'B'   : '—'],
+            [__('stats.circulating'), $crypto->circulating_supply   ? number_format((float)$crypto->circulating_supply/1e6,2).'M '.e($crypto->symbol) : '—'],
+            [__('stats.max_supply'),  $crypto->max_supply           ? number_format((float)$crypto->max_supply/1e6,2).'M'         : '∞'],
+            [__('stats.high_24h'),    $crypto->high_24h             ? '$'.number_format((float)$crypto->high_24h, (float)$crypto->high_24h >= 1 ? 2 : 6) : '—'],
+            [__('stats.low_24h'),     $crypto->low_24h              ? '$'.number_format((float)$crypto->low_24h, (float)$crypto->low_24h >= 1 ? 2 : 6)  : '—'],
+            [__('stats.ath'),         $crypto->ath                  ? '$'.number_format((float)$crypto->ath, (float)$crypto->ath >= 1 ? 2 : 6)           : '—'],
+            [__('stats.ath_change'),  $crypto->ath_change_percentage !== null ? number_format((float)$crypto->ath_change_percentage,2).'%' : '—'],
+            [__('stats.rank'),        $crypto->market_cap_rank      ? '#'.$crypto->market_cap_rank                                : '—'],
         ];
         @endphp
         @foreach ($statItems as [$label, $value])
@@ -257,7 +257,9 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"
+        integrity="sha384-OK7vELvjHdhUFi31JYioPIcRHTROLdcDa6ZsNWgvgLaKj+9JqhU0Ad8g4wz3CXjA"
+        crossorigin="anonymous"></script>
 <script>
 // ── Live price Alpine component ───────────────────────────────────────────
 function coinDetail(slug, initialPrice, initialChange24h) {
@@ -305,14 +307,14 @@ const COIN_SLUG = '{{ $crypto->slug }}';
 const CGBASE    = 'https://api.coingecko.com/api/v3';
 
 const TF_MAP = {
-    '1H':  { days: 1,      interval: 'minutely' },
-    '4H':  { days: 1,      interval: 'minutely' },
-    '1D':  { days: 1,      interval: 'hourly'   },
-    '1W':  { days: 7,      interval: 'hourly'   },
-    '1M':  { days: 30,     interval: 'daily'    },
-    '3M':  { days: 90,     interval: 'daily'    },
-    '1Y':  { days: 365,    interval: 'daily'    },
-    'ALL': { days: 'max',  interval: 'daily'    },
+    '1H':  { days: 1,     interval: ''       },  // CoinGecko auto 5-min for ≤1 day (minutely unsupported on free tier)
+    '4H':  { days: 2,     interval: ''       },  // auto for 2 days
+    '1D':  { days: 1,     interval: 'hourly' },
+    '1W':  { days: 7,     interval: 'hourly' },
+    '1M':  { days: 30,    interval: 'daily'  },
+    '3M':  { days: 90,    interval: 'daily'  },
+    '1Y':  { days: 365,   interval: 'daily'  },
+    'ALL': { days: 'max', interval: 'daily'  },
 };
 
 let priceChart, volChart, priceSeries, candleSeries, volSeries;
@@ -436,9 +438,10 @@ async function setTimeframe(tf) {
 
     const cfg = TF_MAP[tf];
     try {
-        // Fetch price + volume data
+        // Fetch price + volume data (omit interval param when empty — CoinGecko free tier auto-selects)
+        const intParam = cfg.interval ? `&interval=${cfg.interval}` : '';
         const [mktResp, ohlcResp] = await Promise.all([
-            fetch(`${CGBASE}/coins/${COIN_SLUG}/market_chart?vs_currency=usd&days=${cfg.days}&interval=${cfg.interval}`),
+            fetch(`${CGBASE}/coins/${COIN_SLUG}/market_chart?vs_currency=usd&days=${cfg.days}${intParam}`),
             currentType === 'candle'
                 ? fetch(`${CGBASE}/coins/${COIN_SLUG}/ohlc?vs_currency=usd&days=${cfg.days === 'max' ? 365 : cfg.days}`)
                 : Promise.resolve(null),

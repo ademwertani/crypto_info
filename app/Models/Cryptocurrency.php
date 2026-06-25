@@ -32,6 +32,7 @@ class Cryptocurrency extends Model
         'atl_change_percentage',
         'atl_date',
         'description',
+        'sparkline_7d',
     ];
 
     protected $casts = [
@@ -53,6 +54,7 @@ class Cryptocurrency extends Model
         'atl'                                    => 'decimal:10',
         'atl_change_percentage'                  => 'decimal:4',
         'atl_date'                               => 'datetime',
+        'sparkline_7d'                           => 'array',
     ];
 
     /** Format price for display — avoids scientific notation on tiny values. */
