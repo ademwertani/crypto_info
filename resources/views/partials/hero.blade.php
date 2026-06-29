@@ -93,7 +93,6 @@
                 ['label' => '📈 Top Gainers',     'route' => 'market.gainers'],
                 ['label' => '📉 Top Losers',      'route' => 'market.losers'],
                 ['label' => '🌍 Market Cap',      'route' => 'market.global-cap'],
-                ['label' => '📰 Crypto News',     'route' => 'news.index'],
                 ['label' => '⚖️ Compare',         'route' => 'crypto.compare', 'params' => ['slugA' => 'bitcoin', 'slugB' => 'ethereum']],
             ] as $link)
                 <a href="{{ isset($link['params']) ? route($link['route'], $link['params']) : route($link['route']) }}"

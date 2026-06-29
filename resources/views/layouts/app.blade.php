@@ -13,25 +13,38 @@
     @isset($seo)
         <title>{{ $seo->title }}</title>
         <meta name="description" content="{{ $seo->description }}">
+        <meta name="robots" content="{{ $seo->robots ?? 'index,follow,max-image-preview:large' }}">
+        <meta name="author" content="CryptoInfo">
         @if($seo->canonical)
             <link rel="canonical" href="{{ $seo->canonical }}">
         @endif
+        @foreach(($seo->alternateLanguages ?? []) as $lang => $href)
+            <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
+        @endforeach
         <meta property="og:type"        content="{{ $seo->og_type ?? 'website' }}">
+        <meta property="og:locale"     content="{{ $seo->locale ?? str_replace('_', '-', app()->getLocale()) }}">
         <meta property="og:title"       content="{{ $seo->title }}">
         <meta property="og:description" content="{{ $seo->description }}">
         <meta property="og:url"         content="{{ $seo->canonical ?? request()->url() }}">
-        <meta property="og:image"       content="{{ $seo->image ?? asset('images/og-default.png') }}">
+        <meta property="og:image"       content="{{ $seo->image ?? asset('images/og-default.svg') }}">
+        <meta property="og:image:alt"   content="{{ $seo->title }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
         <meta property="og:site_name"   content="CryptoInfo">
         <meta name="twitter:card"        content="summary_large_image">
         <meta name="twitter:title"       content="{{ $seo->title }}">
         <meta name="twitter:description" content="{{ $seo->description }}">
-        <meta name="twitter:image"       content="{{ $seo->image ?? asset('images/og-default.png') }}">
+        <meta name="twitter:image"       content="{{ $seo->image ?? asset('images/og-default.svg') }}">
         @if(!empty($seo->jsonld))
             <script type="application/ld+json">{!! json_encode($seo->jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
         @endif
     @else
         <title>@yield('title', 'Crypto Info') — Live Cryptocurrency Prices</title>
         <meta name="description" content="Real-time cryptocurrency prices, market cap, volume and analytics. Track Bitcoin, Ethereum and 250+ coins with live WebSocket updates.">
+        <meta name="robots" content="index,follow,max-image-preview:large">
+        <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+        <meta property="og:image" content="{{ asset('images/og-default.svg') }}">
+        <meta property="og:image:alt" content="CryptoInfo market overview">
     @endisset
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -118,10 +131,6 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.fear-greed') ? 'bg-slate-800 text-white' : '' }}">
                     {{ __('nav.fear_greed') }}
                 </a>
-                <a href="{{ route('news.index') }}"
-                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">
-                    {{ __('nav.news') }}
-                </a>
                 <a href="{{ route('crypto.compare.chooser') }}"
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.compare*') ? 'bg-slate-800 text-white' : '' }}">
                     ⚖️ {{ __('nav.compare') }}
@@ -199,7 +208,6 @@
             <a href="{{ route('market.trending') }}"   class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.trending') }}</a>
             <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
             <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
-            <a href="{{ route('news.index') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.news') }}</a>
             <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
         </nav>
 
@@ -217,13 +225,23 @@
         <div class="border-t border-slate-800 pt-3">
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('lang.label') }}</p>
             <div class="flex flex-wrap gap-1.5">
-                @foreach(['en'=>['🇬🇧','EN'],'fr'=>['🇫🇷','FR'],'ar'=>['🇸🇦','AR'],'es'=>['🇪🇸','ES'],'de'=>['🇩🇪','DE'],'pt'=>['🇧🇷','PT']] as $code=>[$flag,$short])
+                @php
+                    $mobileLangs = [
+                        'en' => ['flag' => '🇬🇧', 'short' => 'EN'],
+                        'fr' => ['flag' => '🇫🇷', 'short' => 'FR'],
+                        'ar' => ['flag' => '🇸🇦', 'short' => 'AR'],
+                        'es' => ['flag' => '🇪🇸', 'short' => 'ES'],
+                        'de' => ['flag' => '🇩🇪', 'short' => 'DE'],
+                        'pt' => ['flag' => '🇧🇷', 'short' => 'PT'],
+                    ];
+                @endphp
+                @foreach($mobileLangs as $code => $meta)
                 <a href="{{ route('locale.switch', $code) }}"
                    class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
                           {{ app()->getLocale() === $code
                              ? 'border-blue-600 bg-blue-600/20 text-blue-400'
                              : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white' }}">
-                    <span>{{ $flag }}</span><span>{{ $short }}</span>
+                    <span>{{ $meta['flag'] }}</span><span>{{ $meta['short'] }}</span>
                 </a>
                 @endforeach
             </div>
@@ -277,7 +295,6 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.content') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
                     <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>

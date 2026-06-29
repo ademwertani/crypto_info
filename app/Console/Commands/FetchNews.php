@@ -18,6 +18,11 @@ class FetchNews extends Command
     {
         $this->info('Fetching news from CryptoPanic RSS…');
 
+        if (! class_exists(\App\Models\News::class)) {
+            $this->error('News model is not available.');
+            return self::FAILURE;
+        }
+
         $articles = $api->fetchLatest(limit: 30);
 
         if (empty($articles)) {
@@ -31,7 +36,13 @@ class FetchNews extends Command
             $exists = News::where('slug', $article['slug'])->exists();
             if ($exists) continue;
 
-            $summary = $ai->summarizeNews($article['title'], $article['summary']);
+            $summary = null;
+            try {
+                $summary = $ai->summarizeNews($article['title'], $article['summary']);
+            } catch (\Throwable $e) {
+                $this->warn('AI summary skipped: ' . $e->getMessage());
+            }
+
             if ($summary) {
                 $article['ai_summary'] = $summary;
             }

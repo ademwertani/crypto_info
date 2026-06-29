@@ -6,17 +6,19 @@ use App\Models\Cryptocurrency;
 use App\Services\GlobalMarketService;
 use App\Services\SeoService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class MarketController extends Controller
 {
-    private const int CACHE_TTL = 300;
-    private const int LIMIT     = 50;
+    private const CACHE_TTL = 300;
+    private const LIMIT     = 50;
 
     public function gainers(GlobalMarketService $gms): View
     {
         $rows = Cache::remember('crypto_gainers', self::CACHE_TTL, function () {
-            return Cryptocurrency::whereNotNull('price_change_percentage_24h_in_currency')
+            return DB::table('cryptocurrencies')
+                ->whereNotNull('price_change_percentage_24h_in_currency')
                 ->orderByDesc('price_change_percentage_24h_in_currency')
                 ->limit(self::LIMIT)
                 ->get()
@@ -33,7 +35,8 @@ class MarketController extends Controller
     public function losers(GlobalMarketService $gms): View
     {
         $rows = Cache::remember('crypto_losers', self::CACHE_TTL, function () {
-            return Cryptocurrency::whereNotNull('price_change_percentage_24h_in_currency')
+            return DB::table('cryptocurrencies')
+                ->whereNotNull('price_change_percentage_24h_in_currency')
                 ->orderBy('price_change_percentage_24h_in_currency')
                 ->limit(self::LIMIT)
                 ->get()
@@ -50,7 +53,8 @@ class MarketController extends Controller
     public function trending(GlobalMarketService $gms): View
     {
         $rows = Cache::remember('crypto_trending', self::CACHE_TTL, function () {
-            return Cryptocurrency::whereNotNull('total_volume')
+            return DB::table('cryptocurrencies')
+                ->whereNotNull('total_volume')
                 ->orderByDesc('total_volume')
                 ->limit(self::LIMIT)
                 ->get()
@@ -81,7 +85,11 @@ class MarketController extends Controller
         $stats = $gms->getGlobalStats();
 
         $rows = Cache::remember('crypto_top10', self::CACHE_TTL, function () {
-            return Cryptocurrency::orderBy('market_cap_rank')->limit(10)->get()->toArray();
+            return DB::table('cryptocurrencies')
+                ->orderBy('market_cap_rank')
+                ->limit(10)
+                ->get()
+                ->toArray();
         });
         $top10 = $this->hydrate($rows);
 
@@ -98,7 +106,11 @@ class MarketController extends Controller
         $stats = $gms->getGlobalStats();
 
         $rows = Cache::remember('crypto_top20', self::CACHE_TTL, function () {
-            return Cryptocurrency::orderBy('market_cap_rank')->limit(20)->get()->toArray();
+            return DB::table('cryptocurrencies')
+                ->orderBy('market_cap_rank')
+                ->limit(20)
+                ->get()
+                ->toArray();
         });
         $top20 = $this->hydrate($rows);
 

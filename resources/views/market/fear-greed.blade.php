@@ -50,7 +50,10 @@
 
         <p class="text-6xl font-black {{ $color }} tabular-nums mb-2">{{ $fng }}</p>
         <p class="text-xl font-bold text-white mb-1">{{ $label }}</p>
-        <p class="text-xs text-slate-500">Score out of 100 · Updated: {{ now()->format('M d, Y') }}</p>
+        @php
+            $updatedAt = $stats['fng_updated_at'] ?? null;
+        @endphp
+        <p class="text-xs text-slate-500">Score out of 100 · Updated: {{ $updatedAt ? \Carbon\Carbon::parse($updatedAt)->format('M d, Y H:i') : 'Live feed' }}</p>
     </div>
 
     {{-- Scale legend --}}

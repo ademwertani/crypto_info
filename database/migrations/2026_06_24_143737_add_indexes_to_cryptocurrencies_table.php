@@ -13,7 +13,10 @@ return new class extends Migration
             $table->index('price_change_percentage_24h_in_currency', 'idx_change_24h');
             $table->index('price_change_percentage_7d_in_currency',  'idx_change_7d');
             $table->index(['market_cap_rank', 'id'], 'idx_rank_id');
-            $table->fullText(['name', 'symbol'], 'ft_name_symbol');
+
+            if (! in_array(Schema::getConnection()->getDriverName(), ['sqlite'], true)) {
+                $table->fullText(['name', 'symbol'], 'ft_name_symbol');
+            }
         });
     }
 
@@ -23,7 +26,10 @@ return new class extends Migration
             $table->dropIndex('idx_change_24h');
             $table->dropIndex('idx_change_7d');
             $table->dropIndex('idx_rank_id');
-            $table->dropIndex('ft_name_symbol');
+
+            if (! in_array(Schema::getConnection()->getDriverName(), ['sqlite'], true)) {
+                $table->dropIndex('ft_name_symbol');
+            }
         });
     }
 };

@@ -15,11 +15,11 @@ $langs = [
     <button
         @click="open = !open"
         @click.outside="open = false"
-        class="flex items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-800/50 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:border-slate-500 hover:text-white transition-all"
+        class="flex items-center gap-2 rounded-lg border border-slate-700/60 bg-slate-800/60 px-2.5 py-1.5 text-xs font-semibold text-slate-200 shadow-sm shadow-black/20 hover:border-slate-500 hover:text-white transition-all"
         :aria-expanded="open"
         aria-haspopup="listbox"
         aria-label="{{ __('lang.label') }}">
-        <span class="text-sm leading-none">{{ $langs[$current]['flag'] }}</span>
+        <span class="text-base leading-none">{{ $langs[$current]['flag'] }}</span>
         <span class="hidden sm:inline">{{ $langs[$current]['short'] }}</span>
         <svg class="h-3 w-3 text-slate-500 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>

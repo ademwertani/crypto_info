@@ -18,17 +18,31 @@ class GlobalMarketService
 
     public function getGlobalStats(): array
     {
-        return Cache::remember('global_market_stats', self::CACHE_TTL, function () {
+        $stats = Cache::remember('global_market_stats', self::CACHE_TTL, function () {
             $gecko = $this->fetchGeckoGlobal();
             $fng   = $this->fetchFearGreed();
 
             return array_merge($gecko, $fng, ['fetched_at' => now()->toISOString()]);
         });
+
+        if (! isset($stats['fng_updated_at']) && isset($stats['fng_timestamp'])) {
+            $stats['fng_updated_at'] = date('Y-m-d H:i:s', (int) $stats['fng_timestamp']);
+            Cache::put('global_market_stats', $stats, self::CACHE_TTL);
+        }
+
+        return $stats;
     }
 
     public function getFearGreed(): array
     {
-        return Cache::remember('fear_greed_index', self::CACHE_TTL, fn () => $this->fetchFearGreed());
+        $stats = Cache::remember('fear_greed_index', self::CACHE_TTL, fn () => $this->fetchFearGreed());
+
+        if (! isset($stats['fng_updated_at']) && isset($stats['fng_timestamp'])) {
+            $stats['fng_updated_at'] = date('Y-m-d H:i:s', (int) $stats['fng_timestamp']);
+            Cache::put('fear_greed_index', $stats, self::CACHE_TTL);
+        }
+
+        return $stats;
     }
 
     private function fetchGeckoGlobal(): array
@@ -68,6 +82,7 @@ class GlobalMarketService
                 'fng_value'              => (int) ($item['value'] ?? 50),
                 'fng_classification'     => $item['value_classification'] ?? 'Neutral',
                 'fng_timestamp'          => $item['timestamp'] ?? null,
+                'fng_updated_at'         => isset($item['timestamp']) ? date('Y-m-d H:i:s', (int) $item['timestamp']) : null,
             ];
         } catch (\Throwable $e) {
             Log::warning('GlobalMarketService F&G: ' . $e->getMessage());
