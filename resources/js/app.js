@@ -181,6 +181,21 @@ globalThis.Echo = new Echo({
     disableStats:      true,
 });
 
+// ── Theme (dark / light) store ───────────────────────────────────────────
+Alpine.store('theme', {
+    dark: localStorage.getItem('theme') !== 'light',
+    toggle() {
+        this.dark = !this.dark;
+        localStorage.setItem('theme', this.dark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', this.dark);
+        document.documentElement.classList.toggle('light', !this.dark);
+    },
+    init() {
+        document.documentElement.classList.toggle('dark', this.dark);
+        document.documentElement.classList.toggle('light', !this.dark);
+    },
+});
+
 // ── Alpine live-prices store ──────────────────────────────────────────────
 Alpine.store('liveprices', {
     prices:           {},

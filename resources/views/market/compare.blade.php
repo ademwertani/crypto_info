@@ -8,9 +8,63 @@
         <ol class="flex items-center gap-1.5">
             <li><a href="{{ route('crypto.index') }}" class="hover:text-white transition">Home</a></li>
             <li aria-hidden="true">/</li>
-            <li class="text-slate-300">Compare</li>
+            <li><a href="{{ route('crypto.compare.chooser') }}" class="hover:text-white transition">Compare</a></li>
+            <li aria-hidden="true">/</li>
+            <li class="text-slate-300">{{ $coinA->name }} vs {{ $coinB->name }}</li>
         </ol>
     </nav>
+
+    {{-- Inline coin chooser --}}
+    <div class="glass rounded-xl px-4 py-3 mb-6 animate-fade-in"
+         x-data="coinChooser({{ json_encode($allCoins->map(fn($c) => ['name' => $c->name, 'slug' => $c->slug, 'symbol' => strtoupper($c->symbol ?? ''), 'image' => $c->image_url])->values()) }})">
+        <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide shrink-0">⚖️ Change:</span>
+
+            <div class="relative flex-1 min-w-[140px]">
+                <label for="inline-coin-a" class="sr-only">First coin</label>
+                <input id="inline-coin-a" type="text" x-model="searchA" @focus="openA = true" @click.outside="openA = false"
+                       placeholder="{{ $coinA->name }}" aria-autocomplete="list" aria-controls="dropdown-a"
+                       class="w-full rounded-lg border border-blue-700/50 bg-slate-800/60 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all">
+                <div id="dropdown-a" x-show="openA && filteredA.length > 0" x-cloak
+                     class="absolute z-50 mt-1 w-56 rounded-xl border border-slate-700 bg-slate-900 shadow-xl chooser-dropdown">
+                    <template x-for="coin in filteredA" :key="coin.slug">
+                        <button type="button" @click="selectA(coin)"
+                                class="flex items-center gap-2 w-full px-3 py-2 text-left text-xs hover:bg-slate-800 text-slate-300 transition">
+                            <img :src="coin.image" :alt="coin.name" class="h-4 w-4 rounded-full shrink-0" onerror="this.style.display='none'">
+                            <span x-text="coin.name"></span>
+                            <span x-text="coin.symbol" class="text-slate-500 ml-auto"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <span class="text-slate-600 font-semibold" aria-hidden="true">vs</span>
+
+            <div class="relative flex-1 min-w-[140px]">
+                <label for="inline-coin-b" class="sr-only">Second coin</label>
+                <input id="inline-coin-b" type="text" x-model="searchB" @focus="openB = true" @click.outside="openB = false"
+                       placeholder="{{ $coinB->name }}" aria-autocomplete="list" aria-controls="dropdown-b"
+                       class="w-full rounded-lg border border-purple-700/50 bg-slate-800/60 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-400 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-all">
+                <div id="dropdown-b" x-show="openB && filteredB.length > 0" x-cloak
+                     class="absolute z-50 mt-1 w-56 rounded-xl border border-slate-700 bg-slate-900 shadow-xl chooser-dropdown">
+                    <template x-for="coin in filteredB" :key="coin.slug">
+                        <button type="button" @click="selectB(coin)"
+                                class="flex items-center gap-2 w-full px-3 py-2 text-left text-xs hover:bg-slate-800 text-slate-300 transition">
+                            <img :src="coin.image" :alt="coin.name" class="h-4 w-4 rounded-full shrink-0" onerror="this.style.display='none'">
+                            <span x-text="coin.name"></span>
+                            <span x-text="coin.symbol" class="text-slate-500 ml-auto"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <button @click="go()"
+                    :disabled="(!selectedA && !searchA) || (!selectedB && !searchB)"
+                    class="shrink-0 rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-blue-500 transition disabled:opacity-40">
+                Compare →
+            </button>
+        </div>
+    </div>
 
     @php
         $a    = $coinA;
@@ -461,5 +515,38 @@ function setTf(tf) {
 
 initCompareChart();
 loadChartData();
+
+function coinChooser(allCoins) {
+    return {
+        allCoins,
+        selectedA: null, searchA: '', openA: false,
+        selectedB: null, searchB: '', openB: false,
+
+        get filteredA() {
+            const q = this.searchA.toLowerCase();
+            if (!q) return this.allCoins.slice(0, 30);
+            return this.allCoins.filter(c =>
+                c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)
+            ).slice(0, 20);
+        },
+        get filteredB() {
+            const q = this.searchB.toLowerCase();
+            if (!q) return this.allCoins.slice(0, 30);
+            return this.allCoins.filter(c =>
+                c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)
+            ).slice(0, 20);
+        },
+
+        selectA(coin) { this.selectedA = coin; this.searchA = coin.name; this.openA = false; },
+        selectB(coin) { this.selectedB = coin; this.searchB = coin.name; this.openB = false; },
+
+        go() {
+            const slugA = this.selectedA?.slug;
+            const slugB = this.selectedB?.slug;
+            if (!slugA || !slugB || slugA === slugB) return;
+            window.location = '/compare/' + slugA + '-vs-' + slugB;
+        },
+    };
+}
 </script>
 @endpush

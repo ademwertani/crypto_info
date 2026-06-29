@@ -4,6 +4,7 @@
       class="dark"
       @if($isRtl) dir="rtl" @endif>
 <head>
+    <script>if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -121,30 +122,10 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">
                     {{ __('nav.news') }}
                 </a>
-                @auth
-                    <a href="{{ route('watchlist.index') }}"
-                       class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('watchlist.*') ? 'bg-slate-800 text-white' : '' }}">
-                        <svg class="inline-block h-4 w-4 -mt-0.5 {{ $isRtl ? 'ml-1' : 'mr-0.5' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                        </svg>
-                        {{ __('nav.watchlist') }}
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
-                            {{ __('nav.logout') }}
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}"
-                       class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition">
-                        {{ __('nav.login') }}
-                    </a>
-                    <a href="{{ route('register') }}"
-                       class="{{ $isRtl ? 'mr-1' : 'ml-1' }} rounded-lg bg-blue-600 px-4 py-1.5 text-white text-sm font-semibold hover:bg-blue-500 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
-                        {{ __('nav.register') }}
-                    </a>
-                @endauth
+                <a href="{{ route('crypto.compare.chooser') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.compare*') ? 'bg-slate-800 text-white' : '' }}">
+                    ⚖️ {{ __('nav.compare') }}
+                </a>
             </nav>
 
             {{-- Right side: Live badge + lang switcher + mobile menu --}}
@@ -159,6 +140,19 @@
                     </span>
                     {{ __('common.live') }}
                 </div>
+
+                {{-- Theme toggle --}}
+                <button @click="$store.theme.toggle()"
+                        class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                        :aria-label="$store.theme.dark ? 'Switch to light mode' : 'Switch to dark mode'"
+                        title="Toggle dark/light mode">
+                    <svg x-show="$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    <svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                </button>
 
                 {{-- Language switcher --}}
                 @include('partials.language-switcher')
@@ -206,13 +200,18 @@
             <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
             <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
             <a href="{{ route('news.index') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.news') }}</a>
-            @auth
-                <a href="{{ route('watchlist.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.watchlist') }}</a>
-            @else
-                <a href="{{ route('login') }}"           class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.login') }}</a>
-                <a href="{{ route('register') }}"        class="px-3 py-2 rounded-lg bg-blue-600 text-white text-center">{{ __('nav.register') }}</a>
-            @endauth
+            <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
         </nav>
+
+        {{-- Mobile theme toggle --}}
+        <div class="border-t border-slate-800 pt-3 mb-3">
+            <button @click="$store.theme.toggle()"
+                    class="flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 text-sm transition">
+                <svg x-show="$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <span x-text="$store.theme.dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"></span>
+            </button>
+        </div>
 
         {{-- Mobile language switcher --}}
         <div class="border-t border-slate-800 pt-3">

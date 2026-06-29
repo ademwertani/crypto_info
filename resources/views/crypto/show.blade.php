@@ -67,21 +67,8 @@
         </div>
     </div>
 
-    {{-- Watchlist + compare actions --}}
+    {{-- Compare actions --}}
     <div class="flex flex-wrap gap-2 mb-6">
-        @auth
-        <form method="POST" action="{{ route('watchlist.toggle') }}">
-            @csrf
-            <input type="hidden" name="slug" value="{{ $crypto->slug }}">
-            <button class="flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:border-blue-500 hover:text-white transition">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                </svg>
-                Watchlist
-            </button>
-        </form>
-        @endauth
-
         <a href="{{ route('crypto.compare', ['slugA' => $crypto->slug, 'slugB' => 'bitcoin']) }}"
            class="flex items-center gap-1.5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 hover:border-blue-500 hover:text-white transition">
             ⚖️ vs Bitcoin

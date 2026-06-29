@@ -6,9 +6,7 @@ use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsletterController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaticPageController;
-use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Spatie\Sitemap\SitemapGenerator;
@@ -25,7 +23,8 @@ Route::get('/currencies/{slug}', [CryptoController::class, 'show'])
 Route::get('/crypto/{slug}-price', [CryptoController::class, 'show'])
     ->where('slug', '[a-z0-9\-]+')->name('crypto.show.seo');
 
-// ── Compare Tool (Phase 8) ──────────────────────────────────────────────────
+// ── Compare Tool ────────────────────────────────────────────────────────────
+Route::get('/compare', [CompareController::class, 'chooser'])->name('crypto.compare.chooser');
 Route::get('/compare/{slugA}-vs-{slugB}', [CompareController::class, 'show'])
     ->where(['slugA' => '[a-z0-9\-]+', 'slugB' => '[a-z0-9\-]+'])
     ->name('crypto.compare');
@@ -53,22 +52,7 @@ Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
 // ── Newsletter ──────────────────────────────────────────────────────────────
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
-// ── Watchlist (auth) ────────────────────────────────────────────────────────
-Route::middleware('auth')->group(function () {
-    Route::get('/watchlist',                    [WatchlistController::class, 'index'])->name('watchlist.index');
-    Route::post('/watchlist/toggle',            [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
-    Route::post('/watchlist/alerts',            [WatchlistController::class, 'storeAlert'])->name('watchlist.alert.store');
-    Route::delete('/watchlist/alerts/{alert}',  [WatchlistController::class, 'destroyAlert'])->name('watchlist.alert.destroy');
-});
-
-// ── Profile (Breeze) ────────────────────────────────────────────────────────
-Route::middleware('auth')->group(function () {
-    Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-// ── Static / Authority pages (Phase 11) ────────────────────────────────────
+// ── Static pages ────────────────────────────────────────────────────────────
 Route::get('/about',                [StaticPageController::class, 'about'])->name('pages.about');
 Route::get('/our-data-methodology', [StaticPageController::class, 'methodology'])->name('pages.methodology');
 Route::get('/privacy-policy',       [StaticPageController::class, 'privacy'])->name('pages.privacy');
@@ -93,4 +77,3 @@ Route::get('/robots.txt', fn () => Response::make(
     200, ['Content-Type' => 'text/plain']
 ));
 
-require __DIR__ . '/auth.php';

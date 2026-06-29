@@ -9,10 +9,80 @@
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 :root { color-scheme: dark; }
+html.light { color-scheme: light; }
 ::-webkit-scrollbar { inline-size: 6px; }
 ::-webkit-scrollbar-track { background: #0f172a; }
 ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Light mode overrides ─────────────────────────────────────────────────── */
+html.light ::-webkit-scrollbar-track { background: #e2e8f0; }
+html.light ::-webkit-scrollbar-thumb { background: #94a3b8; }
+
+html.light body { background-color: #f1f5f9; color: #0f172a; }
+
+html.light .bg-slate-950,
+html.light .bg-slate-950\/95 { background-color: #ffffff !important; }
+
+html.light .bg-slate-900,
+html.light .bg-slate-900\/40,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80 { background-color: #f8fafc !important; }
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/30,
+html.light .bg-slate-800\/40,
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/60 { background-color: #e2e8f0 !important; }
+
+html.light .glass {
+    background: rgba(255,255,255,0.9) !important;
+    border-color: rgba(148,163,184,0.4) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+html.light .glass-blue {
+    background: rgba(219,234,254,0.6) !important;
+    border-color: rgba(59,130,246,0.25) !important;
+}
+
+html.light .text-white     { color: #0f172a !important; }
+html.light .text-slate-100 { color: #1e293b !important; }
+html.light .text-slate-200 { color: #334155 !important; }
+html.light .text-slate-300 { color: #475569 !important; }
+html.light .text-slate-400 { color: #64748b !important; }
+html.light .text-slate-500 { color: #94a3b8 !important; }
+
+html.light .border-slate-800,
+html.light .border-slate-800\/40,
+html.light .border-slate-800\/50,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/80 { border-color: #cbd5e1 !important; }
+
+html.light .border-slate-700,
+html.light .border-slate-700\/50,
+html.light .border-slate-700\/60 { border-color: #e2e8f0 !important; }
+
+html.light .divide-slate-800\/50 > * + * { border-color: #e2e8f0 !important; }
+
+html.light .skeleton {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+}
+
+html.light .coin-row:hover { background-color: rgba(241,245,249,0.9) !important; }
+
+html.light header,
+html.light nav { background-color: rgba(255,255,255,0.97) !important; border-color: #e2e8f0 !important; }
+
+html.light input,
+html.light select,
+html.light textarea {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+html.light input::placeholder,
+html.light select::placeholder { color: #94a3b8 !important; }
 
 /* ── Live price flash ─────────────────────────────────────────────────────── */
 @keyframes flash-green {
@@ -96,3 +166,10 @@
 .animate-fade-in-delay-1 { animation: fade-in-up 0.5s 0.1s ease-out both; }
 .animate-fade-in-delay-2 { animation: fade-in-up 0.5s 0.2s ease-out both; }
 .animate-fade-in-delay-3 { animation: fade-in-up 0.5s 0.3s ease-out both; }
+
+/* ── Coin chooser dropdown ───────────────────────────────────────────────── */
+.chooser-dropdown {
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
