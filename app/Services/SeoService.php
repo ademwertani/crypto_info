@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cryptocurrency;
 use App\Models\News;
+use Illuminate\Support\Facades\Route;
 
 class SeoService
 {
@@ -12,20 +13,48 @@ class SeoService
     public ?string $canonical  = null;
     public ?string $image      = null;
     public string $og_type     = 'website';
-    public array  $jsonld      = [];
+    public string $robots      = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+    public ?string $locale     = null;
+    public array $alternateLanguages = [];
+    public array $jsonld      = [];
 
     public static function forHome(): self
     {
         $seo              = new self();
-        $seo->title       = 'Crypto Info — Live Cryptocurrency Prices, Market Cap & Volume';
-        $seo->description = 'Real-time prices for Bitcoin, Ethereum and 250+ cryptocurrencies. Track market cap, volume, and 24h changes with live WebSocket updates.';
+        $seo->title       = 'Live Cryptocurrency Prices, Market Cap & Volume | CryptoInfo';
+        $seo->description = 'Track real-time Bitcoin, Ethereum and 250+ crypto prices, market cap, volume and 24h performance with live market data.';
         $seo->canonical   = url('/');
+        $seo->image       = url('/images/og-default.svg');
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => url('/'),
+            'en'        => url('/'),
+            'fr'        => url('/lang/fr'),
+            'ar'        => url('/lang/ar'),
+            'es'        => url('/lang/es'),
+            'de'        => url('/lang/de'),
+            'pt'        => url('/lang/pt'),
+        ];
         $seo->jsonld      = [
             '@context'    => 'https://schema.org',
             '@type'       => 'WebSite',
             'name'        => 'CryptoInfo',
             'url'         => url('/'),
             'description' => $seo->description,
+            'publisher'   => [
+                '@type' => 'Organization',
+                'name'  => 'CryptoInfo',
+                'url'   => url('/'),
+                'logo'  => [
+                    '@type' => 'ImageObject',
+                    'url'   => url('/images/og-default.svg'),
+                ],
+            ],
+            'potentialAction' => [
+                '@type' => 'SearchAction',
+                'target' => url('/?search={search_term_string}'),
+                'query-input' => 'required name=search_term_string',
+            ],
         ];
 
         return $seo;
@@ -41,14 +70,19 @@ class SeoService
         $seo->title       = "{$coin->name} ({$coin->symbol}) Price: \${$price} | CryptoInfo";
         $seo->description = "{$coin->name} price is \${$price} today, {$dir} {$change}% in the last 24h. View market cap, volume, supply and historical data.";
         $seo->canonical   = route('crypto.show', $coin->slug);
-        $seo->image       = $coin->image_url;
+        $seo->image       = $coin->image_url ?: url('/images/og-default.svg');
         $seo->og_type     = 'article';
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
         $seo->jsonld      = [
             '@context'    => 'https://schema.org',
             '@type'       => 'FinancialProduct',
             'name'        => $coin->name,
             'description' => $seo->description,
-            'image'       => $coin->image_url,
+            'image'       => $seo->image,
             'url'         => $seo->canonical,
             'offers'      => [
                 '@type'         => 'Offer',
@@ -66,17 +100,28 @@ class SeoService
         $seo->title       = $article->title . ' | CryptoInfo';
         $seo->description = $article->ai_summary ?? $article->summary ?? substr($article->title, 0, 160);
         $seo->canonical   = url('/');
-        $seo->image       = $article->image_url;
+        if (Route::has('news.show')) {
+            $generated = route('news.show', ['news' => $article->slug], false);
+            if (! empty($generated)) {
+                $seo->canonical = $generated;
+            }
+        }
+        $seo->image       = $article->image_url ?: url('/images/og-default.svg');
         $seo->og_type     = 'article';
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
         $seo->jsonld      = [
             '@context'         => 'https://schema.org',
             '@type'            => 'NewsArticle',
             'headline'         => $article->title,
             'description'      => $seo->description,
-            'image'            => $article->image_url,
+            'image'            => $seo->image,
             'url'              => $seo->canonical,
             'datePublished'    => $article->published_at?->toIso8601String(),
-            'dateModified'     => $article->updated_at->toIso8601String(),
+            'dateModified'     => optional($article->updated_at)->toIso8601String(),
             'publisher'        => [
                 '@type' => 'Organization',
                 'name'  => 'CryptoInfo',
@@ -100,6 +145,12 @@ class SeoService
         $seo->title       = $title . ' | CryptoInfo';
         $seo->description = $desc;
         $seo->canonical   = url("/{$type}");
+        $seo->image       = url('/images/og-default.svg');
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
 
         return $seo;
     }

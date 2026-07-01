@@ -9,29 +9,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0f172a">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
 
     @isset($seo)
         <title>{{ $seo->title }}</title>
         <meta name="description" content="{{ $seo->description }}">
+        <meta name="robots" content="{{ $seo->robots ?? 'index,follow,max-image-preview:large' }}">
+        <meta name="author" content="CryptoInfo">
         @if($seo->canonical)
             <link rel="canonical" href="{{ $seo->canonical }}">
         @endif
+        @foreach(($seo->alternateLanguages ?? []) as $lang => $href)
+            <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
+        @endforeach
         <meta property="og:type"        content="{{ $seo->og_type ?? 'website' }}">
+        <meta property="og:locale"     content="{{ $seo->locale ?? str_replace('_', '-', app()->getLocale()) }}">
         <meta property="og:title"       content="{{ $seo->title }}">
         <meta property="og:description" content="{{ $seo->description }}">
         <meta property="og:url"         content="{{ $seo->canonical ?? request()->url() }}">
-        <meta property="og:image"       content="{{ $seo->image ?? asset('images/og-default.png') }}">
+        <meta property="og:image"       content="{{ $seo->image ?? asset('images/og-default.svg') }}">
+        <meta property="og:image:alt"   content="{{ $seo->title }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
         <meta property="og:site_name"   content="CryptoInfo">
         <meta name="twitter:card"        content="summary_large_image">
         <meta name="twitter:title"       content="{{ $seo->title }}">
         <meta name="twitter:description" content="{{ $seo->description }}">
-        <meta name="twitter:image"       content="{{ $seo->image ?? asset('images/og-default.png') }}">
+        <meta name="twitter:image"       content="{{ $seo->image ?? asset('images/og-default.svg') }}">
         @if(!empty($seo->jsonld))
             <script type="application/ld+json">{!! json_encode($seo->jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
         @endif
     @else
         <title>@yield('title', 'Crypto Info') — Live Cryptocurrency Prices</title>
         <meta name="description" content="Real-time cryptocurrency prices, market cap, volume and analytics. Track Bitcoin, Ethereum and 250+ coins with live WebSocket updates.">
+        <meta name="robots" content="index,follow,max-image-preview:large">
+        <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+        <meta property="og:image" content="{{ asset('images/og-default.svg') }}">
+        <meta property="og:image:alt" content="CryptoInfo market overview">
     @endisset
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -128,8 +142,7 @@
             <div class="flex items-center gap-2 shrink-0">
 
                 {{-- LIVE indicator --}}
-                <div x-show="$store.liveprices.connected" x-cloak
-                     class="hidden sm:flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-400">
+                <div class="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-400">
                     <span class="relative flex h-1.5 w-1.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
@@ -212,7 +225,7 @@
         <div class="border-t border-slate-800 pt-3">
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('lang.label') }}</p>
             <div class="flex flex-wrap gap-1.5">
-                @foreach(['en'=>['gb','EN','English'],'fr'=>['fr','FR','Français'],'ar'=>['sa','AR','العربية'],'es'=>['es','ES','Español'],'de'=>['de','DE','Deutsch'],'pt'=>['br','PT','Português']] as $code=>[$flag,$short,$label])
+                @foreach(['en'=>['gb','EN','English'],'fr'=>['fr','FR','Fran?ais'],'ar'=>['sa','AR','???????'],'es'=>['es','ES','Espa?ol'],'de'=>['de','DE','Deutsch'],'pt'=>['br','PT','Portugu?s']] as $code=>[$flag,$short,$label])
                 <a href="{{ route('locale.switch', $code) }}"
                    class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
                           {{ app()->getLocale() === $code
@@ -226,17 +239,6 @@
                         width="20"
                         height="14">
                     <span>{{ $short }}</span>
-                </a>
-                @endforeach
-            </div>
-            <div class="hidden">
-                @foreach(['en'=>['🇬🇧','EN'],'fr'=>['🇫🇷','FR'],'ar'=>['🇸🇦','AR'],'es'=>['🇪🇸','ES'],'de'=>['🇩🇪','DE'],'pt'=>['🇧🇷','PT']] as $code=>[$flag,$short])
-                <a href="{{ route('locale.switch', $code) }}"
-                   class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
-                          {{ app()->getLocale() === $code
-                             ? 'border-blue-600 bg-blue-600/20 text-blue-400'
-                             : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white' }}">
-                    <span>{{ $flag }}</span><span>{{ $short }}</span>
                 </a>
                 @endforeach
             </div>

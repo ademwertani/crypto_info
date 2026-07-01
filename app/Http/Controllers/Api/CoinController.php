@@ -7,10 +7,11 @@ use App\Models\Cryptocurrency;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class CoinController extends Controller
 {
-    private const int CACHE_TTL = 60;
+    private const CACHE_TTL = 60;
 
     public function index(Request $request): JsonResponse
     {
@@ -20,7 +21,8 @@ class CoinController extends Controller
         $cacheKey = "api_coins_{$page}_{$perPage}";
 
         $data = Cache::remember($cacheKey, self::CACHE_TTL, fn () =>
-            Cryptocurrency::orderBy('market_cap_rank')
+            DB::table('cryptocurrencies')
+                ->orderBy('market_cap_rank')
                 ->paginate($perPage, ['*'], 'page', $page)
         );
 
@@ -38,7 +40,7 @@ class CoinController extends Controller
     public function show(string $slug): JsonResponse
     {
         $coin = Cache::remember("api_coin_{$slug}", self::CACHE_TTL, fn () =>
-            Cryptocurrency::where('slug', $slug)->first()
+            DB::table('cryptocurrencies')->where('slug', $slug)->first()
         );
 
         if (! $coin) {
@@ -51,7 +53,8 @@ class CoinController extends Controller
     public function gainers(): JsonResponse
     {
         $data = Cache::remember('api_gainers', self::CACHE_TTL, fn () =>
-            Cryptocurrency::whereNotNull('price_change_percentage_24h_in_currency')
+            DB::table('cryptocurrencies')
+                ->whereNotNull('price_change_percentage_24h_in_currency')
                 ->orderByDesc('price_change_percentage_24h_in_currency')
                 ->limit(50)
                 ->get()
@@ -63,7 +66,8 @@ class CoinController extends Controller
     public function losers(): JsonResponse
     {
         $data = Cache::remember('api_losers', self::CACHE_TTL, fn () =>
-            Cryptocurrency::whereNotNull('price_change_percentage_24h_in_currency')
+            DB::table('cryptocurrencies')
+                ->whereNotNull('price_change_percentage_24h_in_currency')
                 ->orderBy('price_change_percentage_24h_in_currency')
                 ->limit(50)
                 ->get()
@@ -75,7 +79,8 @@ class CoinController extends Controller
     public function trending(): JsonResponse
     {
         $data = Cache::remember('api_trending', self::CACHE_TTL, fn () =>
-            Cryptocurrency::whereNotNull('total_volume')
+            DB::table('cryptocurrencies')
+                ->whereNotNull('total_volume')
                 ->orderByDesc('total_volume')
                 ->limit(20)
                 ->get()

@@ -15,7 +15,7 @@ $currentLang = $langs[$current] ?? $langs['en'];
     <button
         @click="open = !open"
         @click.outside="open = false"
-        class="flex items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-800/50 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:border-slate-500 hover:text-white transition-all"
+        class="flex items-center gap-2 rounded-lg border border-slate-700/60 bg-slate-800/60 px-2.5 py-1.5 text-xs font-semibold text-slate-200 shadow-sm shadow-black/20 hover:border-slate-500 hover:text-white transition-all"
         :aria-expanded="open"
         aria-haspopup="listbox"
         aria-label="{{ __('lang.label') }}">
