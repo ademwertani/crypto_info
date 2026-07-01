@@ -37,6 +37,7 @@ return [
 
     'coingecko' => [
         'url' => env('COINGECKO_API_URL', 'https://api.coingecko.com/api/v3'),
+        'api_key' => env('COINGECKO_API_KEY'),
     ],
 
 ];

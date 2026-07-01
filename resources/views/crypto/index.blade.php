@@ -1,11 +1,9 @@
 @extends('layouts.app')
 @section('content')
 
-{{-- Phase 1-3: Hero + trust indicators + market status (page 1, no search) --}}
+{{-- Phase 1-3: Hero + market overview (page 1, no search) --}}
 @if(!empty($stats) && $search === '')
     @include('partials.hero', ['stats' => $stats])
-    @include('partials.trust-indicators')
-    @include('partials.market-status')
 @endif
 
 @include('partials.ad-rectangle', ['position' => 'market-top'])

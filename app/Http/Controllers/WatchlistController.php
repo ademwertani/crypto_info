@@ -11,11 +11,6 @@ use Illuminate\View\View;
 
 class WatchlistController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(): View
     {
         $watchlistIds = Watchlist::where('user_id', auth()->id())

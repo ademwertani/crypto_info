@@ -1,17 +1,17 @@
 @php
 $current = app()->getLocale();
 $langs = [
-    'en' => ['flag' => '🇬🇧', 'label' => 'English',   'short' => 'EN'],
-    'fr' => ['flag' => '🇫🇷', 'label' => 'Français',  'short' => 'FR'],
-    'ar' => ['flag' => '🇸🇦', 'label' => 'العربية',   'short' => 'AR'],
-    'es' => ['flag' => '🇪🇸', 'label' => 'Español',   'short' => 'ES'],
-    'de' => ['flag' => '🇩🇪', 'label' => 'Deutsch',   'short' => 'DE'],
-    'pt' => ['flag' => '🇧🇷', 'label' => 'Português', 'short' => 'PT'],
+    'en' => ['flag' => 'gb', 'label' => 'English', 'short' => 'EN'],
+    'fr' => ['flag' => 'fr', 'label' => 'Français', 'short' => 'FR'],
+    'ar' => ['flag' => 'sa', 'label' => 'العربية', 'short' => 'AR'],
+    'es' => ['flag' => 'es', 'label' => 'Español', 'short' => 'ES'],
+    'de' => ['flag' => 'de', 'label' => 'Deutsch', 'short' => 'DE'],
+    'pt' => ['flag' => 'br', 'label' => 'Português', 'short' => 'PT'],
 ];
+$currentLang = $langs[$current] ?? $langs['en'];
 @endphp
 
 <div class="relative" x-data="{ open: false }" x-on:keydown.escape="open = false">
-    {{-- Trigger button --}}
     <button
         @click="open = !open"
         @click.outside="open = false"
@@ -19,14 +19,19 @@ $langs = [
         :aria-expanded="open"
         aria-haspopup="listbox"
         aria-label="{{ __('lang.label') }}">
-        <span class="text-sm leading-none">{{ $langs[$current]['flag'] }}</span>
-        <span class="hidden sm:inline">{{ $langs[$current]['short'] }}</span>
+        <img
+            src="https://flagcdn.com/w20/{{ $currentLang['flag'] }}.png"
+            srcset="https://flagcdn.com/w40/{{ $currentLang['flag'] }}.png 2x"
+            alt="{{ $currentLang['label'] }}"
+            class="h-3.5 w-5 rounded-sm object-cover"
+            width="20"
+            height="14">
+        <span class="hidden sm:inline">{{ $currentLang['short'] }}</span>
         <svg class="h-3 w-3 text-slate-500 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
         </svg>
     </button>
 
-    {{-- Dropdown --}}
     <div
         x-show="open"
         x-transition:enter="transition ease-out duration-100"
@@ -51,7 +56,13 @@ $langs = [
                           {{ $current === $code
                              ? 'bg-blue-600/20 text-blue-400 font-semibold'
                              : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                    <span class="text-base leading-none w-5 text-center">{{ $meta['flag'] }}</span>
+                    <img
+                        src="https://flagcdn.com/w20/{{ $meta['flag'] }}.png"
+                        srcset="https://flagcdn.com/w40/{{ $meta['flag'] }}.png 2x"
+                        alt="{{ $meta['label'] }}"
+                        class="h-3.5 w-5 rounded-sm object-cover"
+                        width="20"
+                        height="14">
                     <span>{{ $meta['label'] }}</span>
                     @if($current === $code)
                         <svg class="ml-auto h-3.5 w-3.5 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

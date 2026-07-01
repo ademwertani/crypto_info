@@ -118,10 +118,6 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('market.fear-greed') ? 'bg-slate-800 text-white' : '' }}">
                     {{ __('nav.fear_greed') }}
                 </a>
-                <a href="{{ route('news.index') }}"
-                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">
-                    {{ __('nav.news') }}
-                </a>
                 <a href="{{ route('crypto.compare.chooser') }}"
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.compare*') ? 'bg-slate-800 text-white' : '' }}">
                     ⚖️ {{ __('nav.compare') }}
@@ -199,7 +195,6 @@
             <a href="{{ route('market.trending') }}"   class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.trending') }}</a>
             <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
             <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
-            <a href="{{ route('news.index') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.news') }}</a>
             <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
         </nav>
 
@@ -217,6 +212,24 @@
         <div class="border-t border-slate-800 pt-3">
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('lang.label') }}</p>
             <div class="flex flex-wrap gap-1.5">
+                @foreach(['en'=>['gb','EN','English'],'fr'=>['fr','FR','Français'],'ar'=>['sa','AR','العربية'],'es'=>['es','ES','Español'],'de'=>['de','DE','Deutsch'],'pt'=>['br','PT','Português']] as $code=>[$flag,$short,$label])
+                <a href="{{ route('locale.switch', $code) }}"
+                   class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
+                          {{ app()->getLocale() === $code
+                             ? 'border-blue-600 bg-blue-600/20 text-blue-400'
+                             : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white' }}">
+                    <img
+                        src="https://flagcdn.com/w20/{{ $flag }}.png"
+                        srcset="https://flagcdn.com/w40/{{ $flag }}.png 2x"
+                        alt="{{ $label }}"
+                        class="h-3.5 w-5 rounded-sm object-cover"
+                        width="20"
+                        height="14">
+                    <span>{{ $short }}</span>
+                </a>
+                @endforeach
+            </div>
+            <div class="hidden">
                 @foreach(['en'=>['🇬🇧','EN'],'fr'=>['🇫🇷','FR'],'ar'=>['🇸🇦','AR'],'es'=>['🇪🇸','ES'],'de'=>['🇩🇪','DE'],'pt'=>['🇧🇷','PT']] as $code=>[$flag,$short])
                 <a href="{{ route('locale.switch', $code) }}"
                    class="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition
@@ -237,9 +250,6 @@
 <main class="flex-1 mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
     @yield('content')
 </main>
-
-{{-- ── Newsletter Section ──────────────────────────────────────────────────── --}}
-@include('partials.newsletter-section')
 
 {{-- ── Footer ─────────────────────────────────────────────────────────────── --}}
 <footer class="border-t border-slate-800/60 bg-slate-950 pt-10 pb-6 text-slate-500">
@@ -277,7 +287,6 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.content') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
                     <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>

@@ -63,9 +63,9 @@ class SeoService
     public static function forNews(News $article): self
     {
         $seo              = new self();
-        $seo->title       = $article->title . ' | CryptoInfo News';
+        $seo->title       = $article->title . ' | CryptoInfo';
         $seo->description = $article->ai_summary ?? $article->summary ?? substr($article->title, 0, 160);
-        $seo->canonical   = route('news.show', $article->slug);
+        $seo->canonical   = url('/');
         $seo->image       = $article->image_url;
         $seo->og_type     = 'article';
         $seo->jsonld      = [

@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\MarketController;
-use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Spatie\Sitemap\SitemapGenerator;
@@ -18,6 +19,9 @@ Route::get('/lang/{locale}', [LocaleController::class, 'switch'])
 
 // ── Homepage ────────────────────────────────────────────────────────────────
 Route::get('/', [CryptoController::class, 'index'])->name('crypto.index');
+Route::get('/dashboard', fn () => view('dashboard'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 Route::get('/currencies/{slug}', [CryptoController::class, 'show'])
     ->where('slug', '[a-z0-9\-]+')->name('crypto.show');
 Route::get('/crypto/{slug}-price', [CryptoController::class, 'show'])
@@ -45,12 +49,19 @@ Route::get('/bitcoin-dominance',      [MarketController::class, 'bitcoinDominanc
 Route::get('/crypto-market-cap',      [MarketController::class, 'globalMarketCap'])->name('market.global-cap');
 Route::get('/global-crypto-volume',   [MarketController::class, 'globalMarketCap'])->name('market.global-volume');
 
-// ── News ────────────────────────────────────────────────────────────────────
-Route::get('/news',        [NewsController::class, 'index'])->name('news.index');
-Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
-
 // ── Newsletter ──────────────────────────────────────────────────────────────
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/watchlist', [WatchlistController::class, 'index'])->name('watchlist.index');
+    Route::post('/watchlist/toggle', [WatchlistController::class, 'toggle'])->name('watchlist.toggle');
+    Route::post('/watchlist/alerts', [WatchlistController::class, 'storeAlert'])->name('watchlist.alert.store');
+    Route::delete('/watchlist/alerts/{alert}', [WatchlistController::class, 'destroyAlert'])->name('watchlist.alert.destroy');
+});
 
 // ── Static pages ────────────────────────────────────────────────────────────
 Route::get('/about',                [StaticPageController::class, 'about'])->name('pages.about');
@@ -77,3 +88,4 @@ Route::get('/robots.txt', fn () => Response::make(
     200, ['Content-Type' => 'text/plain']
 ));
 
+require __DIR__.'/auth.php';
