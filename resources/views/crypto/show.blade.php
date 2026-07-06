@@ -186,37 +186,6 @@
 
     @include('partials.affiliate-sidebar')
 
-    {{-- Price Alert --}}
-    @auth
-    <div class="glass rounded-xl p-4">
-        <p class="mb-3 text-sm font-semibold text-white">Set Price Alert</p>
-        @if (session('status'))
-            <p class="mb-2 text-xs text-emerald-400">{{ session('status') }}</p>
-        @endif
-        <form method="POST" action="{{ route('watchlist.alert.store') }}" class="space-y-3" aria-label="Create price alert">
-            @csrf
-            <input type="hidden" name="cryptocurrency_id" value="{{ $crypto->id }}">
-            <div>
-                <label for="alert-direction" class="sr-only">Alert direction</label>
-                <select id="alert-direction" name="direction"
-                        class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 outline-none">
-                    <option value="above">Price goes above</option>
-                    <option value="below">Price goes below</option>
-                </select>
-            </div>
-            <div>
-                <label for="alert-price" class="block text-xs text-slate-500 mb-1">Target price (USD)</label>
-                <input id="alert-price" type="number" name="target_price" step="any" min="0"
-                       placeholder="{{ number_format((float)$crypto->current_price, 2) }}"
-                       class="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 outline-none">
-            </div>
-            <button class="w-full rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">
-                Create Alert
-            </button>
-        </form>
-    </div>
-    @endauth
-
     {{-- Quick links --}}
     <div class="glass rounded-xl p-4">
         <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Explore</p>
