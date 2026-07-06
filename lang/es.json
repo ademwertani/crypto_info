@@ -6,6 +6,7 @@
     "nav.fear_greed":          "Índice M&C",
     "nav.news":                "Noticias",
     "nav.compare":             "Comparar",
+    "nav.blog":                "Blog",
     "nav.watchlist":           "Mi lista",
     "nav.login":               "Iniciar sesión",
     "nav.register":            "Registrarse",
@@ -107,12 +108,14 @@
     "footer.btc_dominance":"Dominancia BTC",
     "footer.market_cap":  "Cap. mercado",
     "footer.crypto_news": "Noticias cripto",
+    "footer.blog":        "Blog",
     "footer.api_docs":    "Docs API",
     "footer.about":       "Sobre nosotros",
     "footer.methodology": "Nuestros datos",
     "footer.contact":     "Contacto",
     "footer.privacy":     "Privacidad",
     "footer.terms":       "Términos",
+    "footer.cookies":     "Política de cookies",
     "footer.not_financial":"No es asesoramiento financiero",
     "footer.sitemap":     "Mapa del sitio",
     "footer.robots":      "Robots",
@@ -152,5 +155,18 @@
     "common.ai_analysis":         "Análisis IA",
     "common.generated_by_ai":     "Generado por IA · No es asesoramiento financiero",
     "common.not_financial_advice":"No es asesoramiento financiero",
-    "common.view_all":            "Ver todo →"
+    "common.view_all":            "Ver todo →",
+
+    "disclaimer.label":               "Aviso:",
+    "disclaimer.not_financial_advice":"Este contenido se proporciona únicamente con fines informativos y no constituye asesoramiento financiero ni de inversión.",
+
+    "blog.title":            "Guías y Artículos Cripto",
+    "blog.subtitle":         "Guías fáciles de entender sobre los mercados de criptomonedas.",
+    "blog.all_categories":   "Todos",
+    "blog.read_more":        "Leer más",
+    "blog.related_articles": "Artículos relacionados",
+    "blog.related_coins":    "Mencionado en este artículo",
+    "blog.back_to_blog":     "← Volver al Blog",
+    "blog.no_articles":      "Aún no hay artículos en esta categoría.",
+    "blog.published_on":     "Publicado el"
 }

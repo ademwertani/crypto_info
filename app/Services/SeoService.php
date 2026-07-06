@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Article;
 use App\Models\Cryptocurrency;
 use App\Models\News;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,9 @@ class SeoService
     public ?string $locale     = null;
     public array $alternateLanguages = [];
     public array $jsonld      = [];
+    public ?string $breadcrumbLabel = null;
+    /** @var array{label: string, url: string}|null */
+    public ?array $breadcrumbParent = null;
 
     public static function forHome(): self
     {
@@ -72,6 +76,7 @@ class SeoService
         $seo->canonical   = route('crypto.show', $coin->slug);
         $seo->image       = $coin->image_url ?: url('/images/og-default.svg');
         $seo->og_type     = 'article';
+        $seo->breadcrumbLabel = $coin->name;
         $seo->locale      = app()->getLocale();
         $seo->alternateLanguages = [
             'x-default' => $seo->canonical,
@@ -145,6 +150,7 @@ class SeoService
         $seo->title       = $title . ' | CryptoInfo';
         $seo->description = $desc;
         $seo->canonical   = url("/{$type}");
+        $seo->breadcrumbLabel = $title;
         $seo->image       = url('/images/og-default.svg');
         $seo->locale      = app()->getLocale();
         $seo->alternateLanguages = [
@@ -153,5 +159,107 @@ class SeoService
         ];
 
         return $seo;
+    }
+
+    public static function forBlogIndex(): self
+    {
+        $seo              = new self();
+        $seo->title       = 'Crypto Guides & Articles | CryptoInfo';
+        $seo->description = 'Beginner-friendly guides on cryptocurrency: how markets work, wallet security, stablecoins and how to read market data. Informational only, not financial advice.';
+        $seo->canonical   = route('blog.index');
+        $seo->breadcrumbLabel = 'Blog';
+        $seo->image       = url('/images/og-default.svg');
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
+        $seo->jsonld      = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'CollectionPage',
+            'name'        => $seo->title,
+            'description' => $seo->description,
+            'url'         => $seo->canonical,
+        ];
+
+        return $seo;
+    }
+
+    public static function forArticle(Article $article): self
+    {
+        $seo              = new self();
+        $seo->title       = ($article->meta_title ?: $article->title) . ' | CryptoInfo';
+        $seo->description = $article->meta_description ?: $article->excerpt ?: substr($article->title, 0, 160);
+        $seo->canonical   = route('blog.show', $article->slug);
+        $seo->image       = $article->cover_image_url ?: url('/images/og-default.svg');
+        $seo->og_type     = 'article';
+        $seo->breadcrumbLabel = $article->title;
+        $seo->breadcrumbParent = ['label' => 'Blog', 'url' => route('blog.index')];
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
+        $seo->jsonld      = [
+            '@context'      => 'https://schema.org',
+            '@type'         => 'Article',
+            'headline'      => $article->title,
+            'description'   => $seo->description,
+            'image'         => $seo->image,
+            'url'           => $seo->canonical,
+            'datePublished' => $article->published_at?->toIso8601String(),
+            'dateModified'  => optional($article->updated_at)->toIso8601String(),
+            'author'        => [
+                '@type' => 'Organization',
+                'name'  => $article->author_name,
+            ],
+            'publisher'     => [
+                '@type' => 'Organization',
+                'name'  => 'CryptoInfo',
+                'url'   => url('/'),
+                'logo'  => [
+                    '@type' => 'ImageObject',
+                    'url'   => url('/images/og-default.svg'),
+                ],
+            ],
+        ];
+
+        return $seo;
+    }
+
+    /**
+     * Schema.org BreadcrumbList for this page, or null on the homepage
+     * (Google recommends omitting breadcrumbs on the root page).
+     */
+    public function breadcrumbListJsonLd(): ?array
+    {
+        $current = $this->canonical ?? url()->current();
+
+        if ($current === url('/')) {
+            return null;
+        }
+
+        $label = $this->breadcrumbLabel ?? trim(explode('|', $this->title)[0]);
+
+        $items = [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+        ];
+
+        if ($this->breadcrumbParent) {
+            $items[] = [
+                '@type' => 'ListItem', 'position' => 2,
+                'name' => $this->breadcrumbParent['label'], 'item' => $this->breadcrumbParent['url'],
+            ];
+        }
+
+        $items[] = [
+            '@type' => 'ListItem', 'position' => count($items) + 1, 'name' => $label, 'item' => $current,
+        ];
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => $items,
+        ];
     }
 }

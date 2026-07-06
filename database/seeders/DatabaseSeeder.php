@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // Blog content — see ArticleSeeder for the "example content" disclaimer.
+        $this->call(ArticleCategorySeeder::class);
+        $this->call(ArticleSeeder::class);
     }
 }

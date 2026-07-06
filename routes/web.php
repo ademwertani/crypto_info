@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\LocaleController;
@@ -38,10 +39,16 @@ Route::get('/bitcoin-dominance', [MarketController::class, 'bitcoinDominance'])-
 Route::get('/crypto-market-cap', [MarketController::class, 'globalMarketCap'])->name('market.global-cap');
 Route::get('/global-crypto-volume', [MarketController::class, 'globalMarketCap'])->name('market.global-volume');
 
+Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
+Route::get('/blog/{article:slug}', [ArticleController::class, 'show'])
+    ->where('article', '[a-z0-9\-]+')
+    ->name('blog.show');
+
 Route::get('/about', [StaticPageController::class, 'about'])->name('pages.about');
 Route::get('/our-data-methodology', [StaticPageController::class, 'methodology'])->name('pages.methodology');
 Route::get('/privacy-policy', [StaticPageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms-of-service', [StaticPageController::class, 'terms'])->name('pages.terms');
+Route::get('/cookie-policy', [StaticPageController::class, 'cookiePolicy'])->name('pages.cookie-policy');
 Route::get('/contact', [StaticPageController::class, 'contact'])->name('pages.contact');
 Route::post('/contact', [StaticPageController::class, 'submitContact'])->name('pages.contact.submit');
 

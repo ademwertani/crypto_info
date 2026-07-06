@@ -179,6 +179,10 @@
     </div>
     @endif
 
+    <div class="mt-6">
+        @include('partials.content-disclaimer')
+    </div>
+
 </div>
 
 {{-- ── Sidebar ───────────────────────────────────────────────────────────── --}}

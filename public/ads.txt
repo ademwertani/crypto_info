@@ -1,0 +1,14 @@
+# ads.txt — Authorized Digital Sellers
+# https://iabtechlab.com/ads-txt/
+#
+# This file is currently empty on purpose: no advertising partner has been
+# onboarded yet. Do NOT invent publisher IDs, seller IDs or relationship
+# lines here — every line below must come verbatim from the ad network's
+# official onboarding docs (e.g. Raptive) once the site is accepted.
+#
+# When Raptive (or another ad network) provides your account, add the
+# lines they give you below, in the exact format they specify, e.g.:
+#   raptive.com, PUB-ACCOUNT-ID, DIRECT, RAPTIVE-CERT-ID
+#   google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+#
+# ── Add official partner lines below this line ──────────────────────────

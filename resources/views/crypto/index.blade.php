@@ -4,6 +4,15 @@
 {{-- Phase 1-3: Hero + market overview (page 1, no search) --}}
 @if(!empty($stats) && $search === '')
     @include('partials.hero', ['stats' => $stats])
+@else
+    {{-- Hero (which carries the page's H1) is skipped on paginated/search views — keep exactly one H1 for SEO/a11y --}}
+    <h1 class="sr-only">
+        @if($search !== '')
+            {{ __('market.today_prices') }} — "{{ $search }}"
+        @else
+            {{ __('market.today_prices') }}
+        @endif
+    </h1>
 @endif
 
 @include('partials.ad-rectangle', ['position' => 'market-top'])

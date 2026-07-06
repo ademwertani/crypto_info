@@ -6,6 +6,7 @@
     "nav.fear_greed":          "Angst & Gier Index",
     "nav.news":                "Neuigkeiten",
     "nav.compare":             "Vergleichen",
+    "nav.blog":                "Blog",
     "nav.watchlist":           "Watchlist",
     "nav.login":               "Anmelden",
     "nav.register":            "Registrieren",
@@ -107,12 +108,14 @@
     "footer.btc_dominance":"BTC-Dominanz",
     "footer.market_cap":  "Marktkapitalisierung",
     "footer.crypto_news": "Krypto-Neuigkeiten",
+    "footer.blog":        "Blog",
     "footer.api_docs":    "API-Dokumentation",
     "footer.about":       "Über uns",
     "footer.methodology": "Unsere Daten",
     "footer.contact":     "Kontakt",
     "footer.privacy":     "Datenschutz",
     "footer.terms":       "AGB",
+    "footer.cookies":     "Cookie-Richtlinie",
     "footer.not_financial":"Keine Finanzberatung",
     "footer.sitemap":     "Seitenverzeichnis",
     "footer.robots":      "Robots",
@@ -152,5 +155,18 @@
     "common.ai_analysis":         "KI-Analyse",
     "common.generated_by_ai":     "Von KI generiert · Keine Finanzberatung",
     "common.not_financial_advice":"Keine Finanzberatung",
-    "common.view_all":            "Alle anzeigen →"
+    "common.view_all":            "Alle anzeigen →",
+
+    "disclaimer.label":               "Hinweis:",
+    "disclaimer.not_financial_advice":"Dieser Inhalt dient ausschließlich Informationszwecken und stellt keine Finanz- oder Anlageberatung dar.",
+
+    "blog.title":            "Krypto-Guides & Artikel",
+    "blog.subtitle":         "Verständliche Guides, um Kryptomärkte besser zu verstehen.",
+    "blog.all_categories":   "Alle",
+    "blog.read_more":        "Weiterlesen",
+    "blog.related_articles": "Ähnliche Artikel",
+    "blog.related_coins":    "In diesem Artikel erwähnt",
+    "blog.back_to_blog":     "← Zurück zum Blog",
+    "blog.no_articles":      "Noch keine Artikel in dieser Kategorie.",
+    "blog.published_on":     "Veröffentlicht am"
 }

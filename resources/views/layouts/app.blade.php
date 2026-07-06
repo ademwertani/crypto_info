@@ -39,6 +39,9 @@
         @if(!empty($seo->jsonld))
             <script type="application/ld+json">{!! json_encode($seo->jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
         @endif
+        @if($breadcrumbJsonLd = $seo->breadcrumbListJsonLd())
+            <script type="application/ld+json">{!! json_encode($breadcrumbJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+        @endif
     @else
         <title>@yield('title', 'Crypto Info') — Live Cryptocurrency Prices</title>
         <meta name="description" content="Real-time cryptocurrency prices, market cap, volume and analytics. Track Bitcoin, Ethereum and 250+ coins with live WebSocket updates.">
@@ -136,6 +139,10 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('crypto.compare*') ? 'bg-slate-800 text-white' : '' }}">
                     ⚖️ {{ __('nav.compare') }}
                 </a>
+                <a href="{{ route('blog.index') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('blog.*') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.blog') }}
+                </a>
             </nav>
 
             {{-- Right side: Live badge + lang switcher + mobile menu --}}
@@ -209,6 +216,7 @@
             <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
             <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
             <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
+            <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.blog') }}</a>
         </nav>
 
         {{-- Mobile theme toggle --}}
@@ -289,6 +297,7 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.content') }}</p>
                 <ul class="space-y-2 text-sm">
+                    <li><a href="{{ route('blog.index') }}" class="hover:text-white transition">{{ __('footer.blog') }}</a></li>
                     <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>
@@ -301,6 +310,7 @@
                     <li><a href="{{ route('pages.contact') }}"     class="hover:text-white transition">{{ __('footer.contact') }}</a></li>
                     <li><a href="{{ route('pages.privacy') }}"     class="hover:text-white transition">{{ __('footer.privacy') }}</a></li>
                     <li><a href="{{ route('pages.terms') }}"       class="hover:text-white transition">{{ __('footer.terms') }}</a></li>
+                    <li><a href="{{ route('pages.cookie-policy') }}" class="hover:text-white transition">{{ __('footer.cookies') }}</a></li>
                 </ul>
             </div>
 

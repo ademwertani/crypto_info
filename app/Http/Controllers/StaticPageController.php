@@ -50,6 +50,16 @@ class StaticPageController extends Controller
         return view('pages.terms', compact('seo'));
     }
 
+    public function cookiePolicy(): View
+    {
+        $seo = new SeoService();
+        $seo->title       = 'Cookie Policy | CryptoInfo';
+        $seo->description = 'CryptoInfo cookie policy: which cookies we use today and how future advertising cookies will be handled.';
+        $seo->canonical   = route('pages.cookie-policy');
+
+        return view('pages.cookie-policy', compact('seo'));
+    }
+
     public function contact(): View
     {
         $seo = new SeoService();

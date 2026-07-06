@@ -6,6 +6,7 @@
     "nav.fear_greed":          "مؤشر الخوف والجشع",
     "nav.news":                "الأخبار",
     "nav.compare":             "مقارنة",
+    "nav.blog":                "المدونة",
     "nav.watchlist":           "قائمتي",
     "nav.login":               "تسجيل الدخول",
     "nav.register":            "إنشاء حساب",
@@ -107,12 +108,14 @@
     "footer.btc_dominance":"هيمنة BTC",
     "footer.market_cap":  "القيمة السوقية",
     "footer.crypto_news": "أخبار العملات",
+    "footer.blog":        "المدونة",
     "footer.api_docs":    "توثيق API",
     "footer.about":       "من نحن",
     "footer.methodology": "بياناتنا",
     "footer.contact":     "اتصل بنا",
     "footer.privacy":     "الخصوصية",
     "footer.terms":       "الشروط",
+    "footer.cookies":     "سياسة ملفات تعريف الارتباط",
     "footer.not_financial":"ليست نصيحة مالية",
     "footer.sitemap":     "خريطة الموقع",
     "footer.robots":      "Robots",
@@ -152,5 +155,18 @@
     "common.ai_analysis":         "تحليل ذكاء اصطناعي",
     "common.generated_by_ai":     "مولد بالذكاء الاصطناعي · ليست نصيحة مالية",
     "common.not_financial_advice":"ليست نصيحة مالية",
-    "common.view_all":            "عرض الكل ←"
+    "common.view_all":            "عرض الكل ←",
+
+    "disclaimer.label":               "تنويه:",
+    "disclaimer.not_financial_advice":"يُقدَّم هذا المحتوى لأغراض إعلامية فقط ولا يُشكِّل نصيحة مالية أو استثمارية.",
+
+    "blog.title":            "أدلة ومقالات عن العملات المشفرة",
+    "blog.subtitle":         "أدلة سهلة الفهم لمساعدتك على فهم أسواق العملات المشفرة.",
+    "blog.all_categories":   "الكل",
+    "blog.read_more":        "اقرأ المزيد",
+    "blog.related_articles": "مقالات ذات صلة",
+    "blog.related_coins":    "مذكورة في هذا المقال",
+    "blog.back_to_blog":     "← العودة إلى المدونة",
+    "blog.no_articles":      "لا توجد مقالات في هذه الفئة بعد.",
+    "blog.published_on":     "نُشر في"
 }
