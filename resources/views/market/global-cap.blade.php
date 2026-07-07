@@ -103,7 +103,7 @@
                         <td class="px-4 py-3">
                             <a href="{{ route('crypto.show', $coin->slug) }}" class="flex items-center gap-2.5 group">
                                 @if($coin->image_url)
-                                    <img src="{{ $coin->image_url }}" alt="{{ $coin->name }}" class="h-6 w-6 rounded-full" loading="lazy">
+                                    <img src="{{ $coin->image_url }}" alt="{{ $coin->name }}" class="h-6 w-6 rounded-full" loading="lazy" width="24" height="24">
                                 @endif
                                 <div>
                                     <p class="font-medium text-white group-hover:text-blue-400 transition">{{ $coin->name }}</p>

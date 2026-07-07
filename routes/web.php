@@ -5,10 +5,10 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
-use Spatie\Sitemap\SitemapGenerator;
 
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])
     ->where('locale', 'en|fr|ar|es|de|pt')
@@ -50,19 +50,13 @@ Route::get('/privacy-policy', [StaticPageController::class, 'privacy'])->name('p
 Route::get('/terms-of-service', [StaticPageController::class, 'terms'])->name('pages.terms');
 Route::get('/cookie-policy', [StaticPageController::class, 'cookiePolicy'])->name('pages.cookie-policy');
 Route::get('/contact', [StaticPageController::class, 'contact'])->name('pages.contact');
-Route::post('/contact', [StaticPageController::class, 'submitContact'])->name('pages.contact.submit');
+Route::post('/contact', [StaticPageController::class, 'submitContact'])
+    ->middleware('throttle:6,1')
+    ->name('pages.contact.submit');
 
 Route::get('/api-docs', fn () => view('api.docs'))->name('api.docs');
 
-Route::get('/sitemap.xml', function () {
-    $path = storage_path('app/public/sitemap.xml');
-
-    if (! file_exists($path) || filemtime($path) < now()->subHours(12)->timestamp) {
-        SitemapGenerator::create(config('app.url'))->writeToFile($path);
-    }
-
-    return Response::make(file_get_contents($path), 200, ['Content-Type' => 'application/xml']);
-});
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/robots.txt', fn () => Response::make(
     "User-agent: *\nDisallow: /lang/\nSitemap: ".url('/sitemap.xml')."\n",

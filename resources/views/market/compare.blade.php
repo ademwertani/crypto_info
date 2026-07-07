@@ -94,7 +94,7 @@
         <div class="glass rounded-2xl p-5 text-center border border-blue-800/20">
             <div class="flex items-center justify-center gap-2.5 mb-3">
                 @if($a->image_url)
-                    <img src="{{ $a->image_url }}" alt="{{ $a->name }}" class="h-9 w-9 rounded-full" loading="lazy">
+                    <img src="{{ $a->image_url }}" alt="{{ $a->name }}" class="h-9 w-9 rounded-full" loading="lazy" width="36" height="36">
                 @endif
                 <div class="text-left">
                     <p class="font-bold text-white leading-tight">{{ $a->name }}</p>
@@ -113,7 +113,7 @@
         <div class="glass rounded-2xl p-5 text-center border border-purple-800/20">
             <div class="flex items-center justify-center gap-2.5 mb-3">
                 @if($b->image_url)
-                    <img src="{{ $b->image_url }}" alt="{{ $b->name }}" class="h-9 w-9 rounded-full" loading="lazy">
+                    <img src="{{ $b->image_url }}" alt="{{ $b->name }}" class="h-9 w-9 rounded-full" loading="lazy" width="36" height="36">
                 @endif
                 <div class="text-left">
                     <p class="font-bold text-white leading-tight">{{ $b->name }}</p>

@@ -143,6 +143,46 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('blog.*') ? 'bg-slate-800 text-white' : '' }}">
                     {{ __('nav.blog') }}
                 </a>
+
+                {{-- "More" dropdown: groups secondary market pages + company/legal pages that already exist in the footer --}}
+                @php
+                    $moreActive = request()->routeIs(['market.bitcoin-dominance', 'market.global-cap', 'api.docs', 'pages.*']);
+                @endphp
+                <div class="relative" x-data="{ moreOpen: false }" @click.outside="moreOpen = false" @keydown.escape="moreOpen = false">
+                    <button type="button" @click="moreOpen = !moreOpen"
+                            class="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ $moreActive ? 'bg-slate-800 text-white' : '' }}"
+                            :aria-expanded="moreOpen.toString()"
+                            aria-haspopup="true"
+                            aria-label="{{ __('nav.more') }}">
+                        {{ __('nav.more') }}
+                        <svg class="h-3 w-3 transition-transform" :class="moreOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="moreOpen"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute {{ $isRtl ? 'left-0' : 'right-0' }} z-50 mt-2 w-56 rounded-xl border border-slate-800 bg-slate-900 shadow-xl py-2"
+                         style="display: none;"
+                         role="menu"
+                         aria-label="{{ __('nav.more') }}">
+                        <a href="{{ route('market.bitcoin-dominance') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.btc_dominance') }}</a>
+                        <a href="{{ route('market.global-cap') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.market_cap') }}</a>
+                        <a href="{{ route('api.docs') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.api_docs') }}</a>
+                        <div class="my-1.5 border-t border-slate-800"></div>
+                        <a href="{{ route('pages.about') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.about') }}</a>
+                        <a href="{{ route('pages.methodology') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.methodology') }}</a>
+                        <a href="{{ route('pages.contact') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.contact') }}</a>
+                        <div class="my-1.5 border-t border-slate-800"></div>
+                        <a href="{{ route('pages.privacy') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.privacy') }}</a>
+                        <a href="{{ route('pages.terms') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.terms') }}</a>
+                        <a href="{{ route('pages.cookie-policy') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.cookies') }}</a>
+                    </div>
+                </div>
             </nav>
 
             {{-- Right side: Live badge + lang switcher + mobile menu --}}
@@ -214,10 +254,28 @@
             <a href="{{ route('market.losers') }}"     class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.losers') }}</a>
             <a href="{{ route('market.trending') }}"   class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.trending') }}</a>
             <a href="{{ route('market.fear-greed') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.fear_greed') }}</a>
-            <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">BTC Dominance</a>
+            <a href="{{ route('market.bitcoin-dominance') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.btc_dominance') }}</a>
+            <a href="{{ route('market.global-cap') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.market_cap') }}</a>
             <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
             <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.blog') }}</a>
         </nav>
+
+        {{-- Mobile: resources & legal links (kept out of the main grid so it doesn't get too dense) --}}
+        <div class="border-t border-slate-800 pt-3 mb-3">
+            <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.resources') }}</p>
+            <div class="grid grid-cols-2 gap-1 text-sm mb-3">
+                <a href="{{ route('api.docs') }}"          class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.api_docs') }}</a>
+                <a href="{{ route('pages.about') }}"       class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.about') }}</a>
+                <a href="{{ route('pages.methodology') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.methodology') }}</a>
+                <a href="{{ route('pages.contact') }}"     class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.contact') }}</a>
+            </div>
+            <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.legal') }}</p>
+            <div class="grid grid-cols-2 gap-1 text-sm">
+                <a href="{{ route('pages.privacy') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.privacy') }}</a>
+                <a href="{{ route('pages.terms') }}"          class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.terms') }}</a>
+                <a href="{{ route('pages.cookie-policy') }}"  class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.cookies') }}</a>
+            </div>
+        </div>
 
         {{-- Mobile theme toggle --}}
         <div class="border-t border-slate-800 pt-3 mb-3">

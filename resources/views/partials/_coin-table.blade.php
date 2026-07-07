@@ -22,7 +22,7 @@
                 <td class="px-4 py-3.5">
                     <a href="{{ route('crypto.show', $coin->slug) }}" class="flex items-center gap-3" onclick="event.stopPropagation()">
                         @if ($coin->image_url)
-                            <img src="{{ $coin->image_url }}" alt="{{ e($coin->name) }}" class="h-7 w-7 rounded-full shrink-0" loading="lazy">
+                            <img src="{{ $coin->image_url }}" alt="{{ e($coin->name) }}" class="h-7 w-7 rounded-full shrink-0" loading="lazy" width="28" height="28">
                         @endif
                         <div>
                             <p class="font-semibold text-white">{{ e($coin->name) }}</p>
