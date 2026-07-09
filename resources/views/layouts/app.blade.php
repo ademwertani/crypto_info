@@ -5,6 +5,7 @@
       @if($isRtl) dir="rtl" @endif>
 <head>
     <script>if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}</script>
+    <meta name="google-site-verification" content="pUaVbPc3BPR67vbg7x9DOsDGJQnmFlt9RBTCn3W4Wiw" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
