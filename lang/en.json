@@ -171,5 +171,16 @@
     "blog.related_coins":    "Mentioned in this article",
     "blog.back_to_blog":     "← Back to Blog",
     "blog.no_articles":      "No articles in this category yet.",
-    "blog.published_on":     "Published on"
+    "blog.published_on":     "Published on",
+
+    "news.title":             "Crypto News",
+    "news.subtitle":          "The latest cryptocurrency news, market moves and industry updates.",
+    "news.search_placeholder":"Search news…",
+    "news.no_results":        "No news articles found.",
+    "news.read_more":         "Read more",
+    "news.published_on":      "Published on",
+    "news.reading_time":      ":count min read",
+    "news.share":             "Share:",
+    "news.recent_news":       "Recent News",
+    "news.back_to_news":      "← Back to News"
 }

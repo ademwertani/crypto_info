@@ -20,19 +20,27 @@ class CoinController extends Controller
 
         $cacheKey = "api_coins_{$page}_{$perPage}";
 
-        $data = Cache::remember($cacheKey, self::CACHE_TTL, fn () =>
-            DB::table('cryptocurrencies')
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($perPage, $page) {
+            $paginator = DB::table('cryptocurrencies')
                 ->orderBy('market_cap_rank')
-                ->paginate($perPage, ['*'], 'page', $page)
-        );
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            return [
+                'items' => $paginator->items(),
+                'page'       => $paginator->currentPage(),
+                'per_page'   => $paginator->perPage(),
+                'total'      => $paginator->total(),
+                'last_page'  => $paginator->lastPage(),
+            ];
+        });
 
         return response()->json([
-            'data' => $data->items(),
+            'data' => $result['items'],
             'meta' => [
-                'page'       => $data->currentPage(),
-                'per_page'   => $data->perPage(),
-                'total'      => $data->total(),
-                'last_page'  => $data->lastPage(),
+                'page'       => $result['page'],
+                'per_page'   => $result['per_page'],
+                'total'      => $result['total'],
+                'last_page'  => $result['last_page'],
             ],
         ]);
     }

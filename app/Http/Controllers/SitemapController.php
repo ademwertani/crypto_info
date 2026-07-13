@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\Cryptocurrency;
+use App\Models\NewsPost;
 use Illuminate\Http\Response;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
@@ -41,6 +42,7 @@ class SitemapController extends Controller
             ->add(Url::create(route('market.global-cap'))->setPriority(0.7)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('crypto.compare.chooser'))->setPriority(0.6)->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY))
             ->add(Url::create(route('blog.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
+            ->add(Url::create(route('news.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('api.docs'))->setPriority(0.4)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
             ->add(Url::create(route('pages.about'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
             ->add(Url::create(route('pages.methodology'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
@@ -69,6 +71,18 @@ class SitemapController extends Controller
                             ->setLastModificationDate($article->updated_at ?? now())
                             ->setPriority(0.6)
                             ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                    );
+                }
+            });
+
+        NewsPost::query()->published()->select('slug', 'updated_at')
+            ->chunk(500, function ($newsPosts) use ($sitemap) {
+                foreach ($newsPosts as $newsPost) {
+                    $sitemap->add(
+                        Url::create(route('news.show', $newsPost->slug))
+                            ->setLastModificationDate($newsPost->updated_at ?? now())
+                            ->setPriority(0.6)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                     );
                 }
             });

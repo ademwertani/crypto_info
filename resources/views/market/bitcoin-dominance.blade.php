@@ -84,7 +84,7 @@
                 <tbody class="divide-y divide-slate-800/40">
                     @foreach($top10 as $coin)
                     @php
-                        $totalMcap = $stats['total_market_cap'] ?? 1;
+                        $totalMcap = $stats['total_market_cap'] ?: 1;
                         $coinDom   = $coin->market_cap ? ($coin->market_cap / $totalMcap * 100) : 0;
                         $chg       = (float)($coin->price_change_percentage_24h_in_currency ?? 0);
                     @endphp

@@ -171,5 +171,16 @@
     "blog.related_coins":    "مذكورة في هذا المقال",
     "blog.back_to_blog":     "← العودة إلى المدونة",
     "blog.no_articles":      "لا توجد مقالات في هذه الفئة بعد.",
-    "blog.published_on":     "نُشر في"
+    "blog.published_on":     "نُشر في",
+
+    "news.title":             "أخبار العملات المشفرة",
+    "news.subtitle":          "أحدث أخبار العملات المشفرة وتحركات السوق وتطورات القطاع.",
+    "news.search_placeholder":"ابحث عن الأخبار…",
+    "news.no_results":        "لم يتم العثور على أخبار.",
+    "news.read_more":         "اقرأ المزيد",
+    "news.published_on":      "نُشر في",
+    "news.reading_time":      "قراءة :count دقيقة",
+    "news.share":             "مشاركة:",
+    "news.recent_news":       "أخبار حديثة",
+    "news.back_to_news":      "← العودة إلى الأخبار"
 }

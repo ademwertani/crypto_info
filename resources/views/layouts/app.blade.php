@@ -144,6 +144,10 @@
                    class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('blog.*') ? 'bg-slate-800 text-white' : '' }}">
                     {{ __('nav.blog') }}
                 </a>
+                <a href="{{ route('news.index') }}"
+                   class="px-3 py-1.5 rounded-lg hover:bg-slate-800 hover:text-white transition {{ request()->routeIs('news.*') ? 'bg-slate-800 text-white' : '' }}">
+                    {{ __('nav.news') }}
+                </a>
 
                 {{-- "More" dropdown: groups secondary market pages + company/legal pages that already exist in the footer --}}
                 @php
@@ -259,6 +263,7 @@
             <a href="{{ route('market.global-cap') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.market_cap') }}</a>
             <a href="{{ route('crypto.compare.chooser') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">⚖️ {{ __('nav.compare') }}</a>
             <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.blog') }}</a>
+            <a href="{{ route('news.index') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('nav.news') }}</a>
         </nav>
 
         {{-- Mobile: resources & legal links (kept out of the main grid so it doesn't get too dense) --}}
@@ -357,6 +362,7 @@
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.content') }}</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('blog.index') }}" class="hover:text-white transition">{{ __('footer.blog') }}</a></li>
+                    <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
                     <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>

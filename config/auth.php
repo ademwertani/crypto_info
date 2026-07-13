@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => null,
+        'guard' => 'web',
         'passwords' => null,
     ],
 
@@ -35,7 +35,12 @@ return [
     |
     */
 
-    'guards' => [],
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +59,12 @@ return [
     |
     */
 
-    'providers' => [],
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------

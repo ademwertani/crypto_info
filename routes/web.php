@@ -5,6 +5,7 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Support\Facades\Response;
@@ -43,6 +44,11 @@ Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
 Route::get('/blog/{article:slug}', [ArticleController::class, 'show'])
     ->where('article', '[a-z0-9\-]+')
     ->name('blog.show');
+
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/{news:slug}', [NewsController::class, 'show'])
+    ->where('news', '[a-z0-9\-]+')
+    ->name('news.show');
 
 Route::get('/about', [StaticPageController::class, 'about'])->name('pages.about');
 Route::get('/our-data-methodology', [StaticPageController::class, 'methodology'])->name('pages.methodology');

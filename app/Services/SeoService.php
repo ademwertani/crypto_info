@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Article;
 use App\Models\Cryptocurrency;
 use App\Models\News;
-use Illuminate\Support\Facades\Route;
+use App\Models\NewsPost;
 
 class SeoService
 {
@@ -101,16 +101,14 @@ class SeoService
 
     public static function forNews(News $article): self
     {
+        // Canonical intentionally stays the homepage: this targets the
+        // RSS-aggregated News model, which has no public route of its own
+        // (see App\Models\News). Do not point this at news.show — that
+        // route now serves the separate, independent NewsPost module.
         $seo              = new self();
         $seo->title       = $article->title . ' | CryptoInfo';
         $seo->description = $article->ai_summary ?? $article->summary ?? substr($article->title, 0, 160);
         $seo->canonical   = url('/');
-        if (Route::has('news.show')) {
-            $generated = route('news.show', ['news' => $article->slug], false);
-            if (! empty($generated)) {
-                $seo->canonical = $generated;
-            }
-        }
         $seo->image       = $article->image_url ?: url('/images/og-default.svg');
         $seo->og_type     = 'article';
         $seo->locale      = app()->getLocale();
@@ -213,6 +211,68 @@ class SeoService
                 '@type' => 'Organization',
                 'name'  => $article->author_name,
             ],
+            'publisher'     => [
+                '@type' => 'Organization',
+                'name'  => 'CryptoInfo',
+                'url'   => url('/'),
+                'logo'  => [
+                    '@type' => 'ImageObject',
+                    'url'   => url('/images/og-default.svg'),
+                ],
+            ],
+        ];
+
+        return $seo;
+    }
+
+    public static function forNewsIndex(): self
+    {
+        $seo              = new self();
+        $seo->title       = 'Crypto News | CryptoInfo';
+        $seo->description = 'The latest cryptocurrency news: market moves, project updates and industry developments.';
+        $seo->canonical   = route('news.index');
+        $seo->breadcrumbLabel = 'News';
+        $seo->image       = url('/images/og-default.svg');
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
+        $seo->jsonld      = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'CollectionPage',
+            'name'        => $seo->title,
+            'description' => $seo->description,
+            'url'         => $seo->canonical,
+        ];
+
+        return $seo;
+    }
+
+    public static function forNewsArticle(NewsPost $newsPost): self
+    {
+        $seo              = new self();
+        $seo->title       = ($newsPost->meta_title ?: $newsPost->title) . ' | CryptoInfo';
+        $seo->description = $newsPost->meta_description ?: $newsPost->excerpt ?: substr($newsPost->title, 0, 160);
+        $seo->canonical   = route('news.show', $newsPost->slug);
+        $seo->image       = $newsPost->featured_image_url ?: url('/images/og-default.svg');
+        $seo->og_type     = 'article';
+        $seo->breadcrumbLabel = $newsPost->title;
+        $seo->breadcrumbParent = ['label' => 'News', 'url' => route('news.index')];
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
+        $seo->jsonld      = [
+            '@context'      => 'https://schema.org',
+            '@type'         => 'Article',
+            'headline'      => $newsPost->title,
+            'description'   => $seo->description,
+            'image'         => $seo->image,
+            'url'           => $seo->canonical,
+            'datePublished' => $newsPost->published_at?->toIso8601String(),
+            'dateModified'  => optional($newsPost->updated_at)->toIso8601String(),
             'publisher'     => [
                 '@type' => 'Organization',
                 'name'  => 'CryptoInfo',

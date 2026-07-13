@@ -17,5 +17,8 @@ class DatabaseSeeder extends Seeder
         // Blog content — see ArticleSeeder for the "example content" disclaimer.
         $this->call(ArticleCategorySeeder::class);
         $this->call(ArticleSeeder::class);
+
+        // News content — see NewsPostSeeder for the "example content" disclaimer.
+        $this->call(NewsPostSeeder::class);
     }
 }

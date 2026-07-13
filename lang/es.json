@@ -171,5 +171,16 @@
     "blog.related_coins":    "Mencionado en este artículo",
     "blog.back_to_blog":     "← Volver al Blog",
     "blog.no_articles":      "Aún no hay artículos en esta categoría.",
-    "blog.published_on":     "Publicado el"
+    "blog.published_on":     "Publicado el",
+
+    "news.title":             "Noticias Cripto",
+    "news.subtitle":          "Las últimas noticias sobre criptomonedas, movimientos del mercado y novedades del sector.",
+    "news.search_placeholder":"Buscar noticias…",
+    "news.no_results":        "No se encontraron noticias.",
+    "news.read_more":         "Leer más",
+    "news.published_on":      "Publicado el",
+    "news.reading_time":      ":count min de lectura",
+    "news.share":             "Compartir:",
+    "news.recent_news":       "Noticias recientes",
+    "news.back_to_news":      "← Volver a Noticias"
 }
