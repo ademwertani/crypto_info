@@ -43,12 +43,14 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
+            "@php artisan storage:link",
             "npm install --ignore-scripts",
             "npm run build"
         ],
         "start": [
             "Composer\\Config::disableProcessTimeout",
             "@php artisan migrate --force",
+            "@php artisan storage:link",
             "@php artisan app:fetch-crypto-data",
             "npx concurrently -c \"#93c5fd,#fb7185,#4ade80\" \"php artisan serve\" \"php artisan schedule:work\" \"npm run dev\" --names=server,scheduler,vite --kill-others"
         ],
