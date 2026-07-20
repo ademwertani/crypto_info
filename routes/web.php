@@ -51,16 +51,8 @@ Route::get('/news/{news:slug}', [NewsController::class, 'show'])
     ->name('news.show');
 
 Route::get('/about', [StaticPageController::class, 'about'])->name('pages.about');
-Route::get('/our-data-methodology', [StaticPageController::class, 'methodology'])->name('pages.methodology');
 Route::get('/privacy-policy', [StaticPageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms-of-service', [StaticPageController::class, 'terms'])->name('pages.terms');
-Route::get('/cookie-policy', [StaticPageController::class, 'cookiePolicy'])->name('pages.cookie-policy');
-Route::get('/contact', [StaticPageController::class, 'contact'])->name('pages.contact');
-Route::post('/contact', [StaticPageController::class, 'submitContact'])
-    ->middleware('throttle:6,1')
-    ->name('pages.contact.submit');
-
-Route::get('/api-docs', fn () => view('api.docs'))->name('api.docs');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 

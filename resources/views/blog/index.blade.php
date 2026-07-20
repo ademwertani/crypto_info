@@ -14,8 +14,6 @@
     <p class="text-slate-400">{{ __('blog.subtitle') }}</p>
 </div>
 
-@include('partials.ad-rectangle', ['position' => 'blog-index-top'])
-
 {{-- Category filter --}}
 <div class="mb-6 flex flex-wrap gap-2">
     <a href="{{ route('blog.index') }}"

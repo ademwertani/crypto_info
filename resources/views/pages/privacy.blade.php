@@ -56,10 +56,6 @@
             <p>Server logs are purged after 30 days where operationally possible.</p>
         </div>
 
-        <div class="glass rounded-2xl p-6">
-            <h2 class="font-bold text-white mb-3">6. Contact</h2>
-            <p>For privacy questions, use the <a href="{{ route('pages.contact') }}" class="text-blue-400 hover:underline">contact page</a>.</p>
-        </div>
     </div>
 </div>
 

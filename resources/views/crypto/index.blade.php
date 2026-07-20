@@ -15,8 +15,6 @@
     </h1>
 @endif
 
-@include('partials.ad-rectangle', ['position' => 'market-top'])
-
 <div class="mb-5 flex items-end justify-between gap-4 flex-wrap">
     <div>
         <h2 class="text-xl font-bold text-white">{{ __('market.today_prices') }}</h2>

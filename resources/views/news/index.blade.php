@@ -14,8 +14,6 @@
     <p class="text-slate-400">{{ __('news.subtitle') }}</p>
 </div>
 
-@include('partials.ad-rectangle', ['position' => 'news-index-top'])
-
 {{-- Search --}}
 <form method="GET" action="{{ route('news.index') }}" class="mb-6 max-w-md" role="search">
     <label for="news-search" class="sr-only">{{ __('news.search_placeholder') }}</label>

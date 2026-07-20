@@ -46,20 +46,9 @@
         @endphp
 
         @foreach($sections as $i => $html)
-            @if($i === $middleIndex && $middleIndex > 0 && $middleIndex < $lastIndex)
-                @include('partials.ad-rectangle', ['position' => 'article-middle'])
-            @endif
-            @if($i === $lastIndex && $lastIndex > 1)
-                @include('partials.ad-rectangle', ['position' => 'article-before-conclusion'])
-            @endif
-
             <div class="article-section text-sm text-slate-300 leading-relaxed">
                 {!! $html !!}
             </div>
-
-            @if($i === 0 && $lastIndex >= 2)
-                @include('partials.ad-rectangle', ['position' => 'article-after-intro'])
-            @endif
         @endforeach
     </article>
 

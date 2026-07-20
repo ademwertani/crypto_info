@@ -4,6 +4,7 @@
       class="dark"
       @if($isRtl) dir="rtl" @endif>
 <head>
+    <script src="https://quge5.com/88/tag.min.js" data-zone="260368" async data-cfasync="false"></script>
     <script>if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}</script>
     <meta name="google-site-verification" content="pUaVbPc3BPR67vbg7x9DOsDGJQnmFlt9RBTCn3W4Wiw" />
     <meta charset="UTF-8">
@@ -151,7 +152,7 @@
 
                 {{-- "More" dropdown: groups secondary market pages + company/legal pages that already exist in the footer --}}
                 @php
-                    $moreActive = request()->routeIs(['market.bitcoin-dominance', 'market.global-cap', 'api.docs', 'pages.*']);
+                    $moreActive = request()->routeIs(['market.bitcoin-dominance', 'market.global-cap', 'pages.*']);
                 @endphp
                 <div class="relative" x-data="{ moreOpen: false }" @click.outside="moreOpen = false" @keydown.escape="moreOpen = false">
                     <button type="button" @click="moreOpen = !moreOpen"
@@ -177,15 +178,11 @@
                          aria-label="{{ __('nav.more') }}">
                         <a href="{{ route('market.bitcoin-dominance') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.btc_dominance') }}</a>
                         <a href="{{ route('market.global-cap') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.market_cap') }}</a>
-                        <a href="{{ route('api.docs') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.api_docs') }}</a>
                         <div class="my-1.5 border-t border-slate-800"></div>
                         <a href="{{ route('pages.about') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.about') }}</a>
-                        <a href="{{ route('pages.methodology') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.methodology') }}</a>
-                        <a href="{{ route('pages.contact') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.contact') }}</a>
                         <div class="my-1.5 border-t border-slate-800"></div>
                         <a href="{{ route('pages.privacy') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.privacy') }}</a>
                         <a href="{{ route('pages.terms') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.terms') }}</a>
-                        <a href="{{ route('pages.cookie-policy') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.cookies') }}</a>
                     </div>
                 </div>
             </nav>
@@ -270,16 +267,12 @@
         <div class="border-t border-slate-800 pt-3 mb-3">
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.resources') }}</p>
             <div class="grid grid-cols-2 gap-1 text-sm mb-3">
-                <a href="{{ route('api.docs') }}"          class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.api_docs') }}</a>
                 <a href="{{ route('pages.about') }}"       class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.about') }}</a>
-                <a href="{{ route('pages.methodology') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.methodology') }}</a>
-                <a href="{{ route('pages.contact') }}"     class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.contact') }}</a>
             </div>
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.legal') }}</p>
             <div class="grid grid-cols-2 gap-1 text-sm">
                 <a href="{{ route('pages.privacy') }}"        class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.privacy') }}</a>
                 <a href="{{ route('pages.terms') }}"          class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.terms') }}</a>
-                <a href="{{ route('pages.cookie-policy') }}"  class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.cookies') }}</a>
             </div>
         </div>
 
@@ -316,8 +309,6 @@
             </div>
         </div>
     </div>
-
-    @include('partials.ad-leaderboard')
 </header>
 
 {{-- ── Main ────────────────────────────────────────────────────────────────── --}}
@@ -363,7 +354,6 @@
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('blog.index') }}" class="hover:text-white transition">{{ __('footer.blog') }}</a></li>
                     <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
-                    <li><a href="{{ route('api.docs') }}"   class="hover:text-white transition">{{ __('footer.api_docs') }}</a></li>
                 </ul>
             </div>
 
@@ -371,11 +361,8 @@
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.company') }}</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('pages.about') }}"       class="hover:text-white transition">{{ __('footer.about') }}</a></li>
-                    <li><a href="{{ route('pages.methodology') }}" class="hover:text-white transition">{{ __('footer.methodology') }}</a></li>
-                    <li><a href="{{ route('pages.contact') }}"     class="hover:text-white transition">{{ __('footer.contact') }}</a></li>
                     <li><a href="{{ route('pages.privacy') }}"     class="hover:text-white transition">{{ __('footer.privacy') }}</a></li>
                     <li><a href="{{ route('pages.terms') }}"       class="hover:text-white transition">{{ __('footer.terms') }}</a></li>
-                    <li><a href="{{ route('pages.cookie-policy') }}" class="hover:text-white transition">{{ __('footer.cookies') }}</a></li>
                 </ul>
             </div>
 

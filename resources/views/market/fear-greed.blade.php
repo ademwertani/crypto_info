@@ -97,7 +97,6 @@
             </ul>
             <p class="text-xs text-slate-600 mt-2">
                 Data source: <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener" class="text-blue-500 hover:underline">Alternative.me</a>.
-                See our <a href="{{ route('pages.methodology') }}" class="text-blue-500 hover:underline">full methodology</a>.
             </p>
         </div>
     </div>

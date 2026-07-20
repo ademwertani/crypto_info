@@ -77,17 +77,9 @@
             <div class="space-y-2 text-sm text-slate-400 leading-relaxed">
                 <p>✅ <strong class="text-slate-300">Free forever</strong> — No paywalls, no "premium plans" for basic data.</p>
                 <p>✅ <strong class="text-slate-300">No manipulation</strong> — We display data as-is from our sources. No sponsored rankings or paid placements in data tables.</p>
-                <p>✅ <strong class="text-slate-300">Transparent methodology</strong> — How we collect, cache and display data is fully documented. <a href="{{ route('pages.methodology') }}" class="text-blue-400 hover:underline">Read it here</a>.</p>
+                <p>✅ <strong class="text-slate-300">Transparent methodology</strong> — How we collect, cache and display data is fully documented.</p>
                 <p>✅ <strong class="text-slate-300">Not financial advice</strong> — We provide market data only. Always do your own research before investing.</p>
             </div>
-        </div>
-
-        <div class="glass rounded-2xl p-6">
-            <h2 class="text-lg font-bold text-white mb-3">Contact</h2>
-            <p class="text-sm text-slate-400">
-                Questions, feedback or partnership inquiries?
-                <a href="{{ route('pages.contact') }}" class="text-blue-400 hover:underline">Reach out here</a>.
-            </p>
         </div>
 
     </div>

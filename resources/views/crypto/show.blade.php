@@ -188,8 +188,6 @@
 {{-- ── Sidebar ───────────────────────────────────────────────────────────── --}}
 <aside class="mt-8 lg:mt-0 space-y-4">
 
-    @include('partials.affiliate-sidebar')
-
     {{-- Quick links --}}
     <div class="glass rounded-xl p-4">
         <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Explore</p>
@@ -208,8 +206,6 @@
             </a>
         </div>
     </div>
-
-    @include('partials.ad-rectangle', ['position' => 'coin-sidebar'])
 
 </aside>
 

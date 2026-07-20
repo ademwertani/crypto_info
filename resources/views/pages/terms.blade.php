@@ -59,11 +59,6 @@
             <p>We may update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms. We will update the "Last updated" date above when changes are made.</p>
         </div>
 
-        <div class="glass rounded-2xl p-6">
-            <h2 class="font-bold text-white mb-3">8. Contact</h2>
-            <p>Questions about these Terms? <a href="{{ route('pages.contact') }}" class="text-blue-400 hover:underline">Contact us</a>.</p>
-        </div>
-
     </div>
 </div>
 

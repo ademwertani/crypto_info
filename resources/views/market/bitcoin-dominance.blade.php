@@ -131,7 +131,7 @@
         <div class="space-y-2 text-sm text-slate-400 leading-relaxed">
             <p><strong class="text-slate-300">High BTC dominance (60%+)</strong> typically signals a "Bitcoin season" — investors prefer the relative safety of BTC over riskier altcoins. Often occurs during bear markets or periods of uncertainty.</p>
             <p><strong class="text-slate-300">Low BTC dominance (below 40%)</strong> usually indicates an "altcoin season" — capital is rotating from Bitcoin into Ethereum and smaller coins, driven by DeFi, NFTs, or new narratives.</p>
-            <p class="text-xs text-slate-600 mt-3">Data updated every 10 minutes from <a href="https://www.coingecko.com" target="_blank" rel="noopener" class="text-blue-500 hover:underline">CoinGecko</a>. See our <a href="{{ route('pages.methodology') }}" class="text-blue-500 hover:underline">methodology</a>.</p>
+            <p class="text-xs text-slate-600 mt-3">Data updated every 10 minutes from <a href="https://www.coingecko.com" target="_blank" rel="noopener" class="text-blue-500 hover:underline">CoinGecko</a>.</p>
         </div>
     </div>
 

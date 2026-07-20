@@ -43,13 +43,9 @@ class SitemapController extends Controller
             ->add(Url::create(route('crypto.compare.chooser'))->setPriority(0.6)->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY))
             ->add(Url::create(route('blog.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('news.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
-            ->add(Url::create(route('api.docs'))->setPriority(0.4)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
             ->add(Url::create(route('pages.about'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
-            ->add(Url::create(route('pages.methodology'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
-            ->add(Url::create(route('pages.contact'))->setPriority(0.3)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
             ->add(Url::create(route('pages.privacy'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY))
-            ->add(Url::create(route('pages.terms'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY))
-            ->add(Url::create(route('pages.cookie-policy'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY));
+            ->add(Url::create(route('pages.terms'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY));
 
         Cryptocurrency::query()->select('slug', 'updated_at')->orderBy('market_cap_rank')
             ->chunk(500, function ($coins) use ($sitemap) {
