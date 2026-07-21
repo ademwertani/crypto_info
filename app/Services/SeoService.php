@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\Cryptocurrency;
+use App\Models\MoneyPage;
 use App\Models\News;
 use App\Models\NewsPost;
 
@@ -283,6 +284,151 @@ class SeoService
                 ],
             ],
         ];
+
+        return $seo;
+    }
+
+    public static function forPlatformComparisonIndex(): self
+    {
+        $seo = new self();
+        $seo->title = 'Compare Crypto Exchanges & Wallets | CryptoInfo';
+        $seo->description = 'Side-by-side comparisons of the most popular crypto exchanges and wallets — KYC, card support and who each platform is best for.';
+        $seo->canonical = route('platforms.compare');
+        $seo->breadcrumbLabel = 'Compare Platforms';
+        $seo->image = url('/images/og-default.svg');
+        $seo->locale = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en' => $seo->canonical,
+        ];
+        $seo->jsonld = [
+            '@context' => 'https://schema.org',
+            '@type' => 'CollectionPage',
+            'name' => $seo->title,
+            'description' => $seo->description,
+            'url' => $seo->canonical,
+        ];
+
+        return $seo;
+    }
+
+    public static function forAdvertise(): self
+    {
+        $seo = new self();
+        $seo->title = 'Advertise With CryptoInfo — Sponsored Articles, Banners & Press Releases';
+        $seo->description = 'Reach a crypto-native audience with sponsored articles, banner placements and press release distribution on CryptoInfo. Get in touch for current rates.';
+        $seo->canonical = route('advertise.show');
+        $seo->breadcrumbLabel = 'Advertise';
+        $seo->image = url('/images/og-default.svg');
+        $seo->locale = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en' => $seo->canonical,
+        ];
+        $seo->jsonld = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'serviceType' => 'Cryptocurrency media advertising',
+            'name' => $seo->title,
+            'description' => $seo->description,
+            'url' => $seo->canonical,
+            'areaServed' => 'Worldwide',
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => 'CryptoInfo',
+                'url' => url('/'),
+            ],
+        ];
+
+        return $seo;
+    }
+
+    /**
+     * Money pages (guides, exchange reviews, "how to buy X"...). Reuses the
+     * exact same title/description/canonical/og shape as forArticle(), and
+     * folds an Article node plus an optional FAQPage node into a single
+     * schema.org @graph so the layout's one <script type="application/
+     * ld+json"> block (see layouts/app.blade.php) doesn't need to change.
+     */
+    public static function forMoneyPage(MoneyPage $page): self
+    {
+        $seo              = new self();
+        $seo->title       = ($page->meta_title ?: $page->h1) . ' | CryptoInfo';
+        $seo->description = $page->meta_description
+            ?: substr(trim(strip_tags((string) $page->intro_html)), 0, 160);
+        $seo->canonical   = route('guides.show', $page->slug);
+        $seo->image       = url('/images/og-default.svg');
+        $seo->og_type     = 'article';
+        $seo->breadcrumbLabel = $page->h1;
+        $seo->locale      = app()->getLocale();
+
+        // Real per-URL hreflang when this guide has translated siblings
+        // (see translation_group on the model) — every other page type in
+        // this app only ever points alternates back at its own canonical.
+        $siblings = $page->translationSiblings();
+
+        if ($siblings->isNotEmpty()) {
+            $seo->alternateLanguages = $siblings->push($page)
+                ->mapWithKeys(fn (MoneyPage $p) => [$p->locale => route('guides.show', $p->slug)])
+                ->all();
+            $seo->alternateLanguages['x-default'] = $seo->alternateLanguages[$page->locale] ?? $seo->canonical;
+        } else {
+            $seo->alternateLanguages = [
+                'x-default'    => $seo->canonical,
+                $page->locale  => $seo->canonical,
+            ];
+        }
+
+        $articleNode = [
+            '@type'         => 'Article',
+            'headline'      => $page->h1,
+            'description'   => $seo->description,
+            'image'         => $seo->image,
+            'url'           => $seo->canonical,
+            'datePublished' => $page->published_at?->toIso8601String(),
+            'dateModified'  => optional($page->updated_at)->toIso8601String(),
+            'author'        => [
+                '@type' => 'Organization',
+                'name'  => $page->author ?: 'CryptoInfo Team',
+            ],
+            'publisher'     => [
+                '@type' => 'Organization',
+                'name'  => 'CryptoInfo',
+                'url'   => url('/'),
+                'logo'  => [
+                    '@type' => 'ImageObject',
+                    'url'   => url('/images/og-default.svg'),
+                ],
+            ],
+        ];
+
+        $graph = [$articleNode];
+
+        $faqItems = collect($page->faq ?? [])
+            ->filter(fn ($item) => filled($item['q'] ?? null) && filled($item['a'] ?? null));
+
+        if ($faqItems->isNotEmpty()) {
+            $graph[] = [
+                '@type'      => 'FAQPage',
+                'mainEntity' => $faqItems
+                    ->map(fn ($item) => [
+                        '@type'          => 'Question',
+                        'name'           => $item['q'],
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text'  => $item['a'],
+                        ],
+                    ])
+                    ->values()
+                    ->all(),
+            ];
+        }
+
+        // Keep the same flat single-object shape as every other page type
+        // when there's no FAQ to fold in — only use @graph when it's needed.
+        $seo->jsonld = count($graph) > 1
+            ? ['@context' => 'https://schema.org', '@graph' => $graph]
+            : ['@context' => 'https://schema.org'] + $articleNode;
 
         return $seo;
     }

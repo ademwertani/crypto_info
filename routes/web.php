@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AdvertiseController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CryptoController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MarketController;
+use App\Http\Controllers\MoneyPageController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PlatformComparisonController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Support\Facades\Response;
@@ -40,6 +43,8 @@ Route::get('/bitcoin-dominance', [MarketController::class, 'bitcoinDominance'])-
 Route::get('/crypto-market-cap', [MarketController::class, 'globalMarketCap'])->name('market.global-cap');
 Route::get('/global-crypto-volume', [MarketController::class, 'globalMarketCap'])->name('market.global-volume');
 
+Route::get('/compare-platforms', [PlatformComparisonController::class, 'index'])->name('platforms.compare');
+
 Route::get('/blog', [ArticleController::class, 'index'])->name('blog.index');
 Route::get('/blog/{article:slug}', [ArticleController::class, 'show'])
     ->where('article', '[a-z0-9\-]+')
@@ -50,9 +55,21 @@ Route::get('/news/{news:slug}', [NewsController::class, 'show'])
     ->where('news', '[a-z0-9\-]+')
     ->name('news.show');
 
+Route::get('/guides/{moneyPage:slug}', [MoneyPageController::class, 'show'])
+    ->where('moneyPage', '[a-z0-9\-]+')
+    ->name('guides.show');
+Route::get('/guides/{moneyPage:slug}/preview', [MoneyPageController::class, 'preview'])
+    ->where('moneyPage', '[a-z0-9\-]+')
+    ->name('guides.preview');
+
 Route::get('/about', [StaticPageController::class, 'about'])->name('pages.about');
 Route::get('/privacy-policy', [StaticPageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms-of-service', [StaticPageController::class, 'terms'])->name('pages.terms');
+
+Route::get('/advertise', [AdvertiseController::class, 'show'])->name('advertise.show');
+Route::post('/advertise', [AdvertiseController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('advertise.store');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 

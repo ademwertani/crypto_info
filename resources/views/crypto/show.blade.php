@@ -471,5 +471,7 @@ setTimeframe('1W');
         pushLiveTick(live.price);
     }, 2000); // push chart tick every 2s max
 })();
+
+window.CryptoInfoAnalytics?.trackMoneyPageView({ page_type: 'coin_detail', coin: '{{ $crypto->slug }}' });
 </script>
 @endpush

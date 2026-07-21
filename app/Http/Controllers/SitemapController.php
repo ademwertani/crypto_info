@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\Cryptocurrency;
+use App\Models\MoneyPage;
 use App\Models\NewsPost;
 use Illuminate\Http\Response;
 use Spatie\Sitemap\Sitemap;
@@ -41,9 +42,11 @@ class SitemapController extends Controller
             ->add(Url::create(route('market.bitcoin-dominance'))->setPriority(0.7)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('market.global-cap'))->setPriority(0.7)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('crypto.compare.chooser'))->setPriority(0.6)->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY))
+            ->add(Url::create(route('platforms.compare'))->setPriority(0.6)->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY))
             ->add(Url::create(route('blog.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('news.index'))->setPriority(0.8)->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY))
             ->add(Url::create(route('pages.about'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
+            ->add(Url::create(route('advertise.show'))->setPriority(0.5)->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY))
             ->add(Url::create(route('pages.privacy'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY))
             ->add(Url::create(route('pages.terms'))->setPriority(0.2)->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY));
 
@@ -79,6 +82,18 @@ class SitemapController extends Controller
                             ->setLastModificationDate($newsPost->updated_at ?? now())
                             ->setPriority(0.6)
                             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                    );
+                }
+            });
+
+        MoneyPage::query()->published()->select('slug', 'updated_at')
+            ->chunk(500, function ($moneyPages) use ($sitemap) {
+                foreach ($moneyPages as $moneyPage) {
+                    $sitemap->add(
+                        Url::create(route('guides.show', $moneyPage->slug))
+                            ->setLastModificationDate($moneyPage->updated_at ?? now())
+                            ->setPriority(0.7)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
                     );
                 }
             });

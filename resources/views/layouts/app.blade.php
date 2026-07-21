@@ -5,7 +5,9 @@
       @if($isRtl) dir="rtl" @endif>
 <head>
     <script>if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}</script>
-    <meta name="google-site-verification" content="pUaVbPc3BPR67vbg7x9DOsDGJQnmFlt9RBTCn3W4Wiw" />
+    @if(config('services.search_console.verification'))
+        <meta name="google-site-verification" content="{{ config('services.search_console.verification') }}" />
+    @endif
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -76,7 +78,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased"
       x-data="{ mobileMenuOpen: false }"
-      x-init="$store.liveprices.init()">
+      x-init="$store.liveprices.init(); $store.consent.init()">
 
 {{-- ── Global ticker bar ─────────────────────────────────────────────────── --}}
 @include('partials.global-ticker')
@@ -179,6 +181,7 @@
                         <a href="{{ route('market.global-cap') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.market_cap') }}</a>
                         <div class="my-1.5 border-t border-slate-800"></div>
                         <a href="{{ route('pages.about') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.about') }}</a>
+                        <a href="{{ route('advertise.show') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.advertise') }}</a>
                         <div class="my-1.5 border-t border-slate-800"></div>
                         <a href="{{ route('pages.privacy') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.privacy') }}</a>
                         <a href="{{ route('pages.terms') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.terms') }}</a>
@@ -267,6 +270,7 @@
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.resources') }}</p>
             <div class="grid grid-cols-2 gap-1 text-sm mb-3">
                 <a href="{{ route('pages.about') }}"       class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.about') }}</a>
+                <a href="{{ route('advertise.show') }}"    class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.advertise') }}</a>
             </div>
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.legal') }}</p>
             <div class="grid grid-cols-2 gap-1 text-sm">
@@ -360,6 +364,7 @@
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.company') }}</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('pages.about') }}"       class="hover:text-white transition">{{ __('footer.about') }}</a></li>
+                    <li><a href="{{ route('advertise.show') }}"    class="hover:text-white transition">{{ __('footer.advertise') }}</a></li>
                     <li><a href="{{ route('pages.privacy') }}"     class="hover:text-white transition">{{ __('footer.privacy') }}</a></li>
                     <li><a href="{{ route('pages.terms') }}"       class="hover:text-white transition">{{ __('footer.terms') }}</a></li>
                 </ul>
@@ -368,9 +373,9 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ __('footer.trade') }}</p>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="https://www.binance.com/en/register?ref=CRYPTOINFO" target="_blank" rel="noopener sponsored" class="hover:text-yellow-400 transition">Binance ↗</a></li>
-                    <li><a href="https://www.bybit.com/en/register?affiliate_id=CRYPTOINFO" target="_blank" rel="noopener sponsored" class="hover:text-orange-400 transition">Bybit ↗</a></li>
-                    <li><a href="https://www.okx.com/join/CRYPTOINFO" target="_blank" rel="noopener sponsored" class="hover:text-blue-400 transition">OKX ↗</a></li>
+                    <li><x-affiliate-link href="https://www.binance.com/en/register?ref=CRYPTOINFO" network="binance" placement="footer" class="hover:text-yellow-400 transition">Binance ↗</x-affiliate-link></li>
+                    <li><x-affiliate-link href="https://www.bybit.com/en/register?affiliate_id=CRYPTOINFO" network="bybit" placement="footer" class="hover:text-orange-400 transition">Bybit ↗</x-affiliate-link></li>
+                    <li><x-affiliate-link href="https://www.okx.com/join/CRYPTOINFO" network="okx" placement="footer" class="hover:text-blue-400 transition">OKX ↗</x-affiliate-link></li>
                 </ul>
             </div>
         </div>
@@ -400,10 +405,15 @@
                 <a href="/sitemap.xml" class="hover:text-slate-400">{{ __('footer.sitemap') }}</a>
                 &nbsp;·&nbsp;
                 <a href="/robots.txt" class="hover:text-slate-400">{{ __('footer.robots') }}</a>
+                &nbsp;·&nbsp;
+                <button type="button" @click="$store.consent.open()" class="hover:text-slate-400">{{ __('footer.cookies') }}</button>
             </p>
         </div>
     </div>
 </footer>
+
+<x-cookie-consent />
+<x-analytics />
 
 @stack('scripts')
 </body>

@@ -40,4 +40,29 @@ return [
         'api_key' => env('COINGECKO_API_KEY'),
     ],
 
+    'ga4' => [
+        'id' => env('GA4_ID'),
+    ],
+
+    'clarity' => [
+        'id' => env('CLARITY_ID'),
+    ],
+
+    'search_console' => [
+        'verification' => env('SEARCH_CONSOLE_VERIFICATION'),
+    ],
+
+    'advertise' => [
+        // Placeholder until the real contact@ mailbox exists — see the
+        // "action manuelle semaine 3" note in the Advertise module spec.
+        // `?:` (not env()'s own default) so a blank-but-present .env value
+        // still falls back instead of producing a recipient-less email.
+        'contact_email' => env('ADVERTISE_CONTACT_EMAIL') ?: 'contact@example.com',
+    ],
+
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
+    ],
+
 ];

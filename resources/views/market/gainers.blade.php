@@ -10,3 +10,7 @@
 @include('partials._coin-table', ['coins' => $coins, 'highlightCol' => '24h'])
 
 @endsection
+
+@push('scripts')
+<script>window.CryptoInfoAnalytics?.trackMoneyPageView({ page_type: 'gainers' });</script>
+@endpush

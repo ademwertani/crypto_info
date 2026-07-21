@@ -20,5 +20,13 @@ class DatabaseSeeder extends Seeder
 
         // News content — see NewsPostSeeder for the "example content" disclaimer.
         $this->call(NewsPostSeeder::class);
+
+        // Platform comparisons — PlatformComparisonSeeder calls PlatformSeeder
+        // itself too, so it stays safe to run standalone.
+        $this->call(PlatformSeeder::class);
+        $this->call(PlatformComparisonSeeder::class);
+
+        // Ad formats — provisional prices, editable in Filament without touching code.
+        $this->call(AdFormatSeeder::class);
     }
 }

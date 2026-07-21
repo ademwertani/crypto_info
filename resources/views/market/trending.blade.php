@@ -10,3 +10,7 @@
 @include('partials._coin-table', ['coins' => $coins, 'highlightCol' => 'volume'])
 
 @endsection
+
+@push('scripts')
+<script>window.CryptoInfoAnalytics?.trackMoneyPageView({ page_type: 'trending' });</script>
+@endpush

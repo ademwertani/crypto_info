@@ -548,5 +548,7 @@ function coinChooser(allCoins) {
         },
     };
 }
+
+window.CryptoInfoAnalytics?.trackMoneyPageView({ page_type: 'compare', coin: '{{ $a->slug }}-vs-{{ $b->slug }}' });
 </script>
 @endpush

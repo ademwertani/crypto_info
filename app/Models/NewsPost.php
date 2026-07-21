@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class NewsPost extends Model
 {
+    use HasUniqueSlug;
+
     protected $fillable = [
         'title', 'slug', 'excerpt', 'content', 'featured_image',
         'status', 'published_at', 'meta_title', 'meta_description',
@@ -16,33 +18,6 @@ class NewsPost extends Model
     protected $casts = [
         'published_at' => 'datetime',
     ];
-
-    protected static function booted(): void
-    {
-        static::saving(function (NewsPost $post) {
-            if (blank($post->slug)) {
-                $post->slug = static::uniqueSlugFor($post->title, $post->id);
-            }
-        });
-    }
-
-    public static function uniqueSlugFor(string $title, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($title);
-        $slug = $base;
-        $i = 2;
-
-        while (
-            static::where('slug', $slug)
-                ->when($ignoreId, fn (Builder $q) => $q->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
-            $slug = "{$base}-{$i}";
-            $i++;
-        }
-
-        return $slug;
-    }
 
     public function getRouteKeyName(): string
     {
