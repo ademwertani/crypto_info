@@ -4,7 +4,6 @@
       class="dark"
       @if($isRtl) dir="rtl" @endif>
 <head>
-    <script src="https://quge5.com/88/tag.min.js" data-zone="260368" async data-cfasync="false"></script>
     <script>if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}</script>
     <meta name="google-site-verification" content="pUaVbPc3BPR67vbg7x9DOsDGJQnmFlt9RBTCn3W4Wiw" />
     <meta charset="UTF-8">
