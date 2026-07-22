@@ -21,13 +21,6 @@
         </p>
     </div>
 
-    @if($news->featured_image_url)
-        <div class="mb-6 h-56 sm:h-72 w-full overflow-hidden rounded-2xl bg-slate-800/60">
-            <img src="{{ $news->featured_image_url }}" alt="{{ e($news->title) }}"
-                 class="h-full w-full object-cover" width="800" height="288" loading="lazy">
-        </div>
-    @endif
-
     <div class="mb-6">
         @include('partials.content-disclaimer')
     </div>

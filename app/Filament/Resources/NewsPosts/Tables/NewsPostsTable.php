@@ -9,7 +9,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -20,10 +19,6 @@ class NewsPostsTable
     {
         return $table
             ->columns([
-                ImageColumn::make('featured_image')
-                    ->disk('public')
-                    ->label(''),
-
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable()

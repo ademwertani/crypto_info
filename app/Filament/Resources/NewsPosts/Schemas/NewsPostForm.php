@@ -4,7 +4,6 @@ namespace App\Filament\Resources\NewsPosts\Schemas;
 
 use App\Models\NewsPost;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -59,13 +58,6 @@ class NewsPostForm
                             ->maxLength(300)
                             ->rows(2)
                             ->helperText('Short summary shown on the News list page (max 300 characters).')
-                            ->columnSpanFull(),
-
-                        FileUpload::make('featured_image')
-                            ->image()
-                            ->disk('public')
-                            ->directory('news')
-                            ->maxSize(4096)
                             ->columnSpanFull(),
 
                         RichEditor::make('content')

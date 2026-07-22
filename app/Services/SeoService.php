@@ -256,7 +256,7 @@ class SeoService
         $seo->title       = ($newsPost->meta_title ?: $newsPost->title) . ' | CryptoInfo';
         $seo->description = $newsPost->meta_description ?: $newsPost->excerpt ?: substr($newsPost->title, 0, 160);
         $seo->canonical   = route('news.show', $newsPost->slug);
-        $seo->image       = $newsPost->featured_image_url ?: url('/images/og-default.svg');
+        $seo->image       = url('/images/og-default.svg');
         $seo->og_type     = 'article';
         $seo->breadcrumbLabel = $newsPost->title;
         $seo->breadcrumbParent = ['label' => 'News', 'url' => route('news.index')];

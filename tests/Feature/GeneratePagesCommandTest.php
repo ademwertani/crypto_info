@@ -119,6 +119,41 @@ class GeneratePagesCommandTest extends TestCase
         Http::assertSentCount(2);
     }
 
+    /**
+     * Regression test: same MySQL varchar(255) truncation incident found in
+     * news:generate applies here too — meta_description was never capped.
+     */
+    public function test_oversized_meta_description_is_truncated_instead_of_crashing(): void
+    {
+        config(['services.groq.api_key' => 'test-key']);
+
+        $oversizedPayload = [
+            'id' => 'chatcmpl_test',
+            'choices' => [[
+                'index' => 0,
+                'message' => ['role' => 'assistant', 'content' => json_encode([
+                    'meta_title' => 'Oversized Description Test',
+                    'meta_description' => str_repeat('This description is way too long. ', 10),
+                    'intro_html' => '<p>Intro.</p>',
+                    'body_html' => '<h2>Section</h2><p>Body.</p>',
+                    'faq' => [
+                        ['q' => 'Question?', 'a' => 'Answer.'],
+                    ],
+                    'cta_labels' => [],
+                ])],
+                'finish_reason' => 'stop',
+            ]],
+        ];
+
+        Http::fake(['api.groq.com/*' => Http::response($oversizedPayload, 200)]);
+
+        $this->artisan('pages:generate', ['--cluster' => 'exchanges', '--limit' => 1])->assertSuccessful();
+
+        $this->assertDatabaseCount('money_pages', 1);
+        // 191, not 255 — AppServiceProvider sets Builder::defaultStringLength(191).
+        $this->assertLessThanOrEqual(191, mb_strlen(MoneyPage::first()->meta_description));
+    }
+
     public function test_missing_related_coin_slug_does_not_crash(): void
     {
         config(['services.groq.api_key' => 'test-key']);

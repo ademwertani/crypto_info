@@ -43,7 +43,11 @@ class ArticleGeneratorService
             'title' => $spec['title'],
             'article_category_id' => $this->resolveCategoryId($spec['category'] ?? null),
             'meta_title' => Str::limit((string) $data['meta_title'], 60, ''),
-            'meta_description' => (string) $data['meta_description'],
+            // Column is varchar(191) — AppServiceProvider sets
+            // Builder::defaultStringLength(191), not Laravel's usual 255
+            // default. The prompt asks for 140-155 chars but that's not
+            // enforced by the model, so hard-cap it here too.
+            'meta_description' => Str::limit((string) $data['meta_description'], 191, ''),
             'excerpt' => Str::limit((string) $data['excerpt'], 300, ''),
             'sections' => array_values((array) $data['sections']),
             'related_coin_slugs' => $this->resolveCoinSlugs($spec['related_coin_slugs'] ?? []),

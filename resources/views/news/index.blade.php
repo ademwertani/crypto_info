@@ -37,17 +37,6 @@
 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @foreach($news as $post)
     <a href="{{ route('news.show', $post->slug) }}" class="glass rounded-2xl overflow-hidden group flex flex-col">
-        <div class="h-40 w-full bg-slate-800/60 overflow-hidden shrink-0">
-            @if($post->featured_image_url)
-                <img src="{{ $post->featured_image_url }}" alt="{{ e($post->title) }}"
-                     class="h-40 w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                     width="400" height="160" loading="lazy">
-            @else
-                <div class="h-40 w-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 text-slate-600 text-xs font-semibold uppercase tracking-wider">
-                    CryptoInfo
-                </div>
-            @endif
-        </div>
         <div class="p-5 flex flex-col flex-1">
             <h2 class="font-bold text-white leading-snug mb-2 group-hover:text-blue-400 transition-colors">{{ $post->title }}</h2>
             @if($post->excerpt)

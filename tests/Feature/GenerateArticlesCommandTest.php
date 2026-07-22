@@ -102,6 +102,38 @@ class GenerateArticlesCommandTest extends TestCase
         Http::assertSentCount(2);
     }
 
+    /**
+     * Regression test: same MySQL varchar(255) truncation incident found in
+     * news:generate applies here too — meta_description was never capped.
+     */
+    public function test_oversized_meta_description_is_truncated_instead_of_crashing(): void
+    {
+        config(['services.groq.api_key' => 'test-key']);
+        ArticleCategory::create(['name' => 'Security', 'slug' => 'security']);
+
+        $oversizedPayload = [
+            'id' => 'chatcmpl_test',
+            'choices' => [[
+                'index' => 0,
+                'message' => ['role' => 'assistant', 'content' => json_encode([
+                    'meta_title' => 'Oversized Description Test',
+                    'meta_description' => str_repeat('This description is way too long. ', 10),
+                    'excerpt' => 'Short excerpt.',
+                    'sections' => ['<h2>Section</h2><p>Body.</p>'],
+                ])],
+                'finish_reason' => 'stop',
+            ]],
+        ];
+
+        Http::fake(['api.groq.com/*' => Http::response($oversizedPayload, 200)]);
+
+        $this->artisan('blog:generate', ['--category' => 'security', '--limit' => 1])->assertSuccessful();
+
+        $this->assertDatabaseCount('articles', 1);
+        // 191, not 255 — AppServiceProvider sets Builder::defaultStringLength(191).
+        $this->assertLessThanOrEqual(191, mb_strlen(Article::first()->meta_description));
+    }
+
     public function test_missing_category_leaves_article_category_id_null(): void
     {
         config(['services.groq.api_key' => 'test-key']);

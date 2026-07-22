@@ -8,6 +8,7 @@ use App\Services\ArticleGeneratorService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
 #[Signature('blog:generate {--category=} {--limit=5} {--dry-run}')]
@@ -76,7 +77,7 @@ class GenerateArticles extends Command
                 Article::create([...$data, 'slug' => $slug, 'status' => 'draft']);
                 $generated++;
                 $rows[] = [$spec['title'], $spec['category'] ?? '—', 'generated (draft)'];
-            } catch (ArticleGenerationException $e) {
+            } catch (ArticleGenerationException|QueryException $e) {
                 $failed++;
                 $rows[] = [$spec['title'], $spec['category'] ?? '—', 'FAILED'];
                 $this->warn("Failed: {$spec['title']} — {$e->getMessage()}");

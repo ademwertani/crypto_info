@@ -104,6 +104,43 @@ XML;
         Http::assertNothingSent();
     }
 
+    /**
+     * Regression test for a real production incident: Groq returned a
+     * 235-char meta_description for a Tesla/CoinDesk story, and MySQL
+     * (varchar(255), strict mode) rejected the whole insert with
+     * "Data too long for column 'meta_description'", crashing the batch.
+     */
+    public function test_oversized_meta_description_is_truncated_instead_of_crashing(): void
+    {
+        config(['services.groq.api_key' => 'test-key']);
+
+        $oversizedPayload = [
+            'id' => 'chatcmpl_test',
+            'choices' => [[
+                'index' => 0,
+                'message' => ['role' => 'assistant', 'content' => json_encode([
+                    'meta_title' => 'Oversized Description Test',
+                    'meta_description' => str_repeat('This description is way too long. ', 10),
+                    'excerpt' => 'Short excerpt.',
+                    'content_html' => '<p>Body.</p>',
+                ])],
+                'finish_reason' => 'stop',
+            ]],
+        ];
+
+        Http::fake([
+            'coindesk.com/*' => Http::response($this->rssFixture(), 200),
+            'cointelegraph.com/*' => Http::response('<rss version="2.0"><channel></channel></rss>', 200),
+            'api.groq.com/*' => Http::response($oversizedPayload, 200),
+        ]);
+
+        $this->artisan('news:generate', ['--limit' => 1])->assertSuccessful();
+
+        $this->assertDatabaseCount('news_posts', 1);
+        // 191, not 255 — AppServiceProvider sets Builder::defaultStringLength(191).
+        $this->assertLessThanOrEqual(191, mb_strlen(NewsPost::first()->meta_description));
+    }
+
     public function test_no_rss_items_returned_is_not_an_error(): void
     {
         config(['services.groq.api_key' => 'test-key']);

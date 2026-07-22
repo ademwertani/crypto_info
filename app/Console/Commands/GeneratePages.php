@@ -8,10 +8,11 @@ use App\Services\MoneyPageGeneratorService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
 #[Signature('pages:generate {--cluster=} {--limit=5} {--dry-run}')]
-#[Description('Generate draft MoneyPage content via the Anthropic API — always drafts, never publishes')]
+#[Description('Generate draft MoneyPage content via the Groq API — always drafts, never publishes')]
 class GeneratePages extends Command
 {
     // Hard ceiling regardless of what --limit is passed — cost control
@@ -76,7 +77,7 @@ class GeneratePages extends Command
                 MoneyPage::create([...$data, 'slug' => $slug, 'status' => 'draft']);
                 $generated++;
                 $rows[] = [$spec['title'], $spec['cluster'], 'generated (draft)'];
-            } catch (MoneyPageGenerationException $e) {
+            } catch (MoneyPageGenerationException|QueryException $e) {
                 $failed++;
                 $rows[] = [$spec['title'], $spec['cluster'], 'FAILED'];
                 $this->warn("Failed: {$spec['title']} — {$e->getMessage()}");

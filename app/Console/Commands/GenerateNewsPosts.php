@@ -9,6 +9,8 @@ use App\Services\NewsPostGeneratorService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 
 #[Signature('news:generate {--limit=10} {--dry-run}')]
 #[Description('Draft NewsPost articles from real RSS news items via the Groq API — always drafts, expands only real facts, never invents news')]
@@ -72,7 +74,12 @@ class GenerateNewsPosts extends Command
                 $data = $generator->generate($item);
 
                 NewsPost::create([...$data,
-                    'title' => $item['title'],
+                    // title/slug are both varchar(191) (see the
+                    // meta_description incident) — real headlines have
+                    // stayed well under that so far, but nothing enforced
+                    // it, so an unusually long one would crash the batch
+                    // the same way.
+                    'title' => Str::limit($item['title'], 191, ''),
                     'status' => 'draft',
                     'published_at' => $item['published_at'] ?? now(),
                     'source_url' => $item['url'],
@@ -81,7 +88,7 @@ class GenerateNewsPosts extends Command
 
                 $generated++;
                 $rows[] = [$item['title'], $item['source'] ?? '—', 'generated (draft)'];
-            } catch (NewsPostGenerationException $e) {
+            } catch (NewsPostGenerationException|QueryException $e) {
                 $failed++;
                 $rows[] = [$item['title'], $item['source'] ?? '—', 'FAILED'];
                 $this->warn("Failed: {$item['title']} — {$e->getMessage()}");

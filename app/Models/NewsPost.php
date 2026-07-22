@@ -11,7 +11,7 @@ class NewsPost extends Model
     use HasUniqueSlug;
 
     protected $fillable = [
-        'title', 'slug', 'excerpt', 'content', 'featured_image',
+        'title', 'slug', 'excerpt', 'content',
         'status', 'published_at', 'meta_title', 'meta_description',
         'source_url', 'source_name',
     ];
@@ -30,11 +30,6 @@ class NewsPost extends Model
         $words = str_word_count(strip_tags((string) $this->content));
 
         return max(1, (int) ceil($words / 200));
-    }
-
-    public function getFeaturedImageUrlAttribute(): ?string
-    {
-        return $this->featured_image ? asset('storage/'.$this->featured_image) : null;
     }
 
     public function scopePublished(Builder $query): Builder

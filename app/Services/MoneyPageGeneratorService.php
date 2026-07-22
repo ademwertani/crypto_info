@@ -38,7 +38,13 @@ class MoneyPageGeneratorService
             'type' => $spec['type'],
             'cluster' => $spec['cluster'],
             'meta_title' => Str::limit((string) $data['meta_title'], 60, ''),
-            'meta_description' => (string) $data['meta_description'],
+            // Column is varchar(191) — AppServiceProvider sets
+            // Builder::defaultStringLength(191), not Laravel's usual 255
+            // default. The prompt asks for 140-155 chars but that's not
+            // enforced by the model, so hard-cap it here too (the descLen
+            // warning below is informational only, it never stopped an
+            // oversized value from reaching the DB before this).
+            'meta_description' => Str::limit((string) $data['meta_description'], 191, ''),
             'intro_html' => (string) $data['intro_html'],
             'body_html' => (string) $data['body_html'],
             'faq' => array_values((array) $data['faq']),

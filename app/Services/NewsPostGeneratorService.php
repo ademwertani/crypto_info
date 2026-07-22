@@ -44,7 +44,15 @@ class NewsPostGeneratorService
             'excerpt' => Str::limit((string) $data['excerpt'], 300, ''),
             'content' => (string) $data['content_html'],
             'meta_title' => Str::limit((string) $data['meta_title'], 60, ''),
-            'meta_description' => (string) $data['meta_description'],
+            // Column is varchar(191) — AppServiceProvider sets
+            // Builder::defaultStringLength(191), so every plain string()
+            // column here is 191, not Laravel's usual 255 default. The
+            // prompt asks for 140-155 chars but that's not enforced by the
+            // model, so hard-cap it here too (see the Tesla/CoinDesk
+            // incident: a 235-char description crashed the whole batch with
+            // a MySQL truncation error — the first fix used 255 and still
+            // wasn't enough).
+            'meta_description' => Str::limit((string) $data['meta_description'], 191, ''),
         ];
     }
 
