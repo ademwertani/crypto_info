@@ -55,12 +55,12 @@
         </div>
 
         <div class="glass rounded-2xl p-6 border border-yellow-500/20 bg-yellow-950/10">
-            <h2 class="font-bold text-yellow-400 mb-3">8. Affiliate Disclosure</h2>
+            <h2 class="font-bold text-yellow-400 mb-3">7. Affiliate Disclosure</h2>
             <p>CryptoInfo participates in affiliate/referral programs with cryptocurrency exchanges, including Binance, Bybit and OKX. Some links on this site (for example in the footer "Trade" section) are affiliate links: if you sign up or trade through them, CryptoInfo may earn a commission, <strong class="text-slate-300">at no additional cost to you</strong>. Affiliate links are marked with <code class="rounded bg-slate-800 px-1 text-xs">rel="sponsored"</code> and are never a factor in the market data, prices or rankings displayed elsewhere on the site. See our <a href="{{ route('pages.privacy') }}" class="text-blue-400 hover:underline">Privacy Policy</a> for how affiliate-link clicks are measured.</p>
         </div>
 
         <div class="glass rounded-2xl p-6">
-            <h2 class="font-bold text-white mb-3">9. Changes to Terms</h2>
+            <h2 class="font-bold text-white mb-3">8. Changes to Terms</h2>
             <p>We may update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms. We will update the "Last updated" date above when changes are made.</p>
         </div>
 

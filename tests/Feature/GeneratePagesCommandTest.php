@@ -11,7 +11,7 @@ class GeneratePagesCommandTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function validAnthropicPayload(): array
+    private function validGroqPayload(): array
     {
         $body = json_encode([
             'meta_title' => 'How to Buy Bitcoin Safely in 2026',
@@ -33,25 +33,33 @@ class GeneratePagesCommandTest extends TestCase
         ]);
 
         return [
-            'id' => 'msg_test',
-            'type' => 'message',
-            'role' => 'assistant',
-            'content' => [['type' => 'text', 'text' => $body]],
-            'model' => 'claude-sonnet-5',
-            'stop_reason' => 'end_turn',
-            'usage' => ['input_tokens' => 100, 'output_tokens' => 500],
+            'id' => 'chatcmpl_test',
+            'object' => 'chat.completion',
+            'model' => 'llama-3.3-70b-versatile',
+            'choices' => [
+                [
+                    'index' => 0,
+                    'message' => ['role' => 'assistant', 'content' => $body],
+                    'finish_reason' => 'stop',
+                ],
+            ],
+            'usage' => ['prompt_tokens' => 100, 'completion_tokens' => 500],
         ];
     }
 
-    private function malformedAnthropicPayload(): array
+    private function malformedGroqPayload(): array
     {
         return [
-            'id' => 'msg_bad',
-            'type' => 'message',
-            'role' => 'assistant',
-            'content' => [['type' => 'text', 'text' => 'Sorry, here is not quite { valid json']],
-            'model' => 'claude-sonnet-5',
-            'stop_reason' => 'end_turn',
+            'id' => 'chatcmpl_bad',
+            'object' => 'chat.completion',
+            'model' => 'llama-3.3-70b-versatile',
+            'choices' => [
+                [
+                    'index' => 0,
+                    'message' => ['role' => 'assistant', 'content' => 'Sorry, here is not quite { valid json'],
+                    'finish_reason' => 'stop',
+                ],
+            ],
         ];
     }
 
@@ -68,8 +76,8 @@ class GeneratePagesCommandTest extends TestCase
 
     public function test_generates_requested_number_of_drafts_for_cluster(): void
     {
-        config(['services.anthropic.api_key' => 'test-key']);
-        Http::fake(['api.anthropic.com/*' => Http::response($this->validAnthropicPayload(), 200)]);
+        config(['services.groq.api_key' => 'test-key']);
+        Http::fake(['api.groq.com/*' => Http::response($this->validGroqPayload(), 200)]);
 
         $this->artisan('pages:generate', ['--cluster' => 'exchanges', '--limit' => 5])
             ->assertSuccessful();
@@ -81,8 +89,8 @@ class GeneratePagesCommandTest extends TestCase
 
     public function test_rerun_is_idempotent_and_makes_no_new_api_calls(): void
     {
-        config(['services.anthropic.api_key' => 'test-key']);
-        Http::fake(['api.anthropic.com/*' => Http::response($this->validAnthropicPayload(), 200)]);
+        config(['services.groq.api_key' => 'test-key']);
+        Http::fake(['api.groq.com/*' => Http::response($this->validGroqPayload(), 200)]);
 
         // "exchanges" has exactly 8 entries in config/money_pages_pipeline.php —
         // a --limit high enough to exhaust the whole cluster on the first run,
@@ -98,10 +106,10 @@ class GeneratePagesCommandTest extends TestCase
 
     public function test_malformed_json_response_is_skipped_without_crashing(): void
     {
-        config(['services.anthropic.api_key' => 'test-key']);
-        Http::fake(['api.anthropic.com/*' => Http::sequence()
-            ->push($this->malformedAnthropicPayload(), 200)
-            ->push($this->validAnthropicPayload(), 200),
+        config(['services.groq.api_key' => 'test-key']);
+        Http::fake(['api.groq.com/*' => Http::sequence()
+            ->push($this->malformedGroqPayload(), 200)
+            ->push($this->validGroqPayload(), 200),
         ]);
 
         $this->artisan('pages:generate', ['--cluster' => 'exchanges', '--limit' => 1])
@@ -113,11 +121,11 @@ class GeneratePagesCommandTest extends TestCase
 
     public function test_missing_related_coin_slug_does_not_crash(): void
     {
-        config(['services.anthropic.api_key' => 'test-key']);
+        config(['services.groq.api_key' => 'test-key']);
         config(['money_pages_pipeline.pages' => [
             ['title' => 'How to Buy Fakecoin', 'type' => 'buy_asset', 'cluster' => 'exchanges', 'related_coin_slugs' => ['nonexistent-coin-xyz']],
         ]]);
-        Http::fake(['api.anthropic.com/*' => Http::response($this->validAnthropicPayload(), 200)]);
+        Http::fake(['api.groq.com/*' => Http::response($this->validGroqPayload(), 200)]);
 
         $this->artisan('pages:generate', ['--cluster' => 'exchanges', '--limit' => 1])
             ->assertSuccessful();
@@ -129,7 +137,7 @@ class GeneratePagesCommandTest extends TestCase
 
     public function test_missing_api_key_fails_fast(): void
     {
-        config(['services.anthropic.api_key' => null]);
+        config(['services.groq.api_key' => null]);
         Http::fake();
 
         $this->artisan('pages:generate', ['--cluster' => 'exchanges', '--limit' => 1])

@@ -26,7 +26,7 @@ class MoneyPageGeneratorService
      */
     public function generate(array $spec): array
     {
-        $response = $this->callAnthropic(
+        $response = $this->callGroq(
             $this->buildSystemPrompt($spec['type']),
             $this->buildUserPrompt($spec),
         );
@@ -107,18 +107,14 @@ PROMPT;
     }
 
     /**
-     * @return array<string, mixed> Decoded Anthropic Messages API response.
+     * @return array<string, mixed> Decoded Groq (OpenAI-compatible) chat completions response.
      *
      * @throws MoneyPageGenerationException
      */
-    private function callAnthropic(string $system, string $user): array
+    private function callGroq(string $system, string $user): array
     {
         try {
-            $response = Http::withHeaders([
-                'x-api-key' => (string) config('services.anthropic.api_key'),
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ])
+            $response = Http::withToken((string) config('services.groq.api_key'))
                 ->timeout(self::TIMEOUT_SECONDS)
                 ->retry(
                     self::MAX_RETRIES,
@@ -137,11 +133,11 @@ PROMPT;
                         return false;
                     }
                 )
-                ->post('https://api.anthropic.com/v1/messages', [
-                    'model' => config('services.anthropic.model'),
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => config('services.groq.model'),
                     'max_tokens' => self::MAX_TOKENS,
-                    'system' => $system,
                     'messages' => [
+                        ['role' => 'system', 'content' => $system],
                         ['role' => 'user', 'content' => $user],
                     ],
                 ]);
@@ -150,9 +146,9 @@ PROMPT;
 
             return $response->json() ?? [];
         } catch (ConnectionException|RequestException $e) {
-            Log::error('MoneyPageGeneratorService: Anthropic API call failed', ['message' => $e->getMessage()]);
+            Log::error('MoneyPageGeneratorService: Groq API call failed', ['message' => $e->getMessage()]);
 
-            throw new MoneyPageGenerationException('Anthropic API call failed: '.$e->getMessage(), previous: $e);
+            throw new MoneyPageGenerationException('Groq API call failed: '.$e->getMessage(), previous: $e);
         }
     }
 
@@ -164,26 +160,26 @@ PROMPT;
      */
     private function parseResponse(array $response, string $title): array
     {
-        if (($response['stop_reason'] ?? null) === 'max_tokens') {
-            throw new MoneyPageGenerationException("Anthropic response was truncated (max_tokens) for \"{$title}\".");
+        if (($response['choices'][0]['finish_reason'] ?? null) === 'length') {
+            throw new MoneyPageGenerationException("Groq response was truncated (max_tokens) for \"{$title}\".");
         }
 
-        $text = $response['content'][0]['text'] ?? null;
+        $text = $response['choices'][0]['message']['content'] ?? null;
 
         if (! is_string($text) || trim($text) === '') {
-            throw new MoneyPageGenerationException("Anthropic response had no text content for \"{$title}\".");
+            throw new MoneyPageGenerationException("Groq response had no text content for \"{$title}\".");
         }
 
         $text = $this->stripCodeFences($text);
         $data = json_decode($text, true);
 
         if (json_last_error() !== JSON_ERROR_NONE || ! is_array($data)) {
-            throw new MoneyPageGenerationException("Anthropic response was not valid JSON for \"{$title}\": ".json_last_error_msg());
+            throw new MoneyPageGenerationException("Groq response was not valid JSON for \"{$title}\": ".json_last_error_msg());
         }
 
         foreach (['meta_title', 'meta_description', 'intro_html', 'body_html', 'faq'] as $key) {
             if (empty($data[$key])) {
-                throw new MoneyPageGenerationException("Anthropic response missing required field \"{$key}\" for \"{$title}\".");
+                throw new MoneyPageGenerationException("Groq response missing required field \"{$key}\" for \"{$title}\".");
             }
         }
 

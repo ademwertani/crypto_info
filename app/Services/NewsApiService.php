@@ -8,27 +8,39 @@ use Illuminate\Support\Str;
 
 class NewsApiService
 {
-    // Uses CryptoPanic public RSS feed (no API key required for basic usage)
-    private const RSS_URL = 'https://cryptopanic.com/news/rss/';
+    // CryptoPanic's public /news/rss/ endpoint now serves their Vue.js app
+    // shell instead of XML (returns 200 but isn't a feed anymore) — these
+    // two publishers still serve real RSS 2.0 with no API key required.
+    private const FEEDS = [
+        'CoinDesk' => 'https://www.coindesk.com/arc/outboundfeeds/rss/',
+        'CoinTelegraph' => 'https://cointelegraph.com/rss',
+    ];
 
     public function fetchLatest(int $limit = 30): array
     {
-        try {
-            $response = Http::timeout(15)->get(self::RSS_URL);
+        $items = [];
 
-            if (! $response->ok()) {
-                Log::warning('CryptoPanic RSS returned ' . $response->status());
-                return [];
+        foreach (self::FEEDS as $source => $url) {
+            try {
+                $response = Http::timeout(15)->get($url);
+
+                if (! $response->ok()) {
+                    Log::warning("{$source} RSS returned ".$response->status());
+                    continue;
+                }
+
+                $items = [...$items, ...$this->parseRss($response->body(), $source)];
+            } catch (\Throwable $e) {
+                Log::error("NewsApiService ({$source}): ".$e->getMessage());
             }
-
-            return $this->parseRss($response->body(), $limit);
-        } catch (\Throwable $e) {
-            Log::error('NewsApiService: ' . $e->getMessage());
-            return [];
         }
+
+        usort($items, fn ($a, $b) => strcmp($b['published_at'], $a['published_at']));
+
+        return array_slice($items, 0, $limit);
     }
 
-    private function parseRss(string $xml, int $limit): array
+    private function parseRss(string $xml, string $source): array
     {
         libxml_use_internal_errors(true);
         $feed = simplexml_load_string($xml);
@@ -40,14 +52,14 @@ class NewsApiService
         $items = [];
 
         foreach ($feed->channel->item as $item) {
-            if (count($items) >= $limit) break;
-
             $title = (string) $item->title;
             $url   = (string) $item->link;
             $date  = (string) $item->pubDate;
             $desc  = strip_tags((string) ($item->description ?? ''));
 
-            if (empty($title) || empty($url)) continue;
+            if (empty($title) || empty($url)) {
+                continue;
+            }
 
             $slug = Str::slug($title);
             if (strlen($slug) > 191) {
@@ -59,7 +71,7 @@ class NewsApiService
                 'slug'         => $slug,
                 'summary'      => $desc ? substr($desc, 0, 500) : null,
                 'url'          => $url,
-                'source'       => 'CryptoPanic',
+                'source'       => $source,
                 'image_url'    => null,
                 'coin_slugs'   => null,
                 'sentiment'    => 'neutral',

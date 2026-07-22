@@ -38,6 +38,15 @@
         </div>
     </article>
 
+    @if($news->source_url)
+    <p class="mt-4 text-xs text-slate-500">
+        {{ __('news.source') }}:
+        <a href="{{ $news->source_url }}" target="_blank" rel="noopener nofollow" class="text-blue-400 hover:underline">
+            {{ $news->source_name ?: __('news.original_article') }} ↗
+        </a>
+    </p>
+    @endif
+
     {{-- Share --}}
     <div class="mt-6 flex flex-wrap items-center gap-3">
         <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">{{ __('news.share') }}</span>

@@ -60,6 +60,16 @@
             <p>Server logs are purged after 30 days where operationally possible.</p>
         </div>
 
+        {{-- Legal entity name and postal address to be added here once
+             provided — required for a complete GDPR Art. 13 "data controller"
+             notice. Do not fabricate placeholder values in the meantime. --}}
+        <div class="glass rounded-2xl p-6">
+            <h2 class="font-bold text-white mb-3">6. Contact Us</h2>
+            <p>For any question about this Privacy Policy or to exercise your data rights (access, correction, deletion), contact us at
+                <a href="mailto:{{ config('services.advertise.contact_email') }}" class="text-blue-400 hover:underline">{{ config('services.advertise.contact_email') }}</a>.
+            </p>
+        </div>
+
     </div>
 </div>
 

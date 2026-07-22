@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cryptocurrency;
+use App\Models\MoneyPage;
 use App\Services\AiSummaryService;
 use App\Services\GlobalMarketService;
 use App\Services\SeoService;
@@ -149,9 +150,25 @@ class CryptoController extends Controller
             return $ai->whyPriceMoved($crypto->name, $change);
         });
 
+        // Cache the plain array, never the Eloquent instance itself — the
+        // file cache driver's unserialize() can hand back an incomplete
+        // App\Models\MoneyPage object depending on autoload timing (same
+        // reason crypto_detail_{slug} below caches (array) $coin, not $coin).
+        $buyGuideRow = Cache::remember("crypto_buy_guide_{$slug}", self::CACHE_TTL, function () use ($crypto) {
+            $guide = MoneyPage::query()
+                ->published()
+                ->where('type', 'buy_asset')
+                ->whereJsonContains('related_coin_ids', (int) $crypto->id)
+                ->first(['h1', 'slug']);
+
+            return $guide?->toArray();
+        });
+
+        $buyGuide = $buyGuideRow ? (object) $buyGuideRow : null;
+
         $seo = SeoService::forCoin($crypto);
 
-        return view('crypto.show', compact('crypto', 'seo', 'aiExplanation'));
+        return view('crypto.show', compact('crypto', 'seo', 'aiExplanation', 'buyGuide'));
     }
 
     private function paginateQuery(string $search, int $page): LengthAwarePaginator

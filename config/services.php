@@ -57,12 +57,12 @@ return [
         // "action manuelle semaine 3" note in the Advertise module spec.
         // `?:` (not env()'s own default) so a blank-but-present .env value
         // still falls back instead of producing a recipient-less email.
-        'contact_email' => env('ADVERTISE_CONTACT_EMAIL') ?: 'contact@example.com',
+        'contact_email' => env('ADVERTISE_CONTACT_EMAIL') ?: 'contact@cryptoinfo.business',
     ],
 
-    'anthropic' => [
-        'api_key' => env('ANTHROPIC_API_KEY'),
-        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
     ],
 
 ];

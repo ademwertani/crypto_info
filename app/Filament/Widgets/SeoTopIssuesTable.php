@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\Articles\ArticleResource;
 use App\Filament\Resources\MoneyPages\MoneyPageResource;
 use App\Filament\Resources\NewsPosts\NewsPostResource;
 use App\Services\SeoAuditor;
@@ -15,12 +16,13 @@ class SeoTopIssuesTable extends TableWidget
 {
     protected static ?string $heading = 'Top 20 pages to fix';
 
-    // Only NewsPost and MoneyPage have a Filament resource today — Article
-    // and Cryptocurrency have no admin CRUD yet, so those rows only get a
-    // "View" action rather than a dead "Edit" link.
+    // Cryptocurrency has no admin CRUD (auto-synced by cron, never
+    // hand-edited) — its rows only get a "View" action. Every other content
+    // type below has a Filament resource, so those get a real "Edit" link.
     private const EDIT_RESOURCES = [
         'news_post' => NewsPostResource::class,
         'money_page' => MoneyPageResource::class,
+        'article' => ArticleResource::class,
     ];
 
     public function table(Table $table): Table

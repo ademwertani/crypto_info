@@ -13,6 +13,7 @@ class NewsPost extends Model
     protected $fillable = [
         'title', 'slug', 'excerpt', 'content', 'featured_image',
         'status', 'published_at', 'meta_title', 'meta_description',
+        'source_url', 'source_name',
     ];
 
     protected $casts = [

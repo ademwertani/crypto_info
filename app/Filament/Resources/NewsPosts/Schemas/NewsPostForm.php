@@ -85,6 +85,21 @@ class NewsPostForm
                             ->maxLength(255)
                             ->helperText('Falls back to the excerpt if left empty.'),
                     ]),
+
+                Section::make('Source')
+                    ->description('Only set on posts drafted by `news:generate` from a real RSS item — leave blank for hand-written posts.')
+                    ->columns(2)
+                    ->collapsible()
+                    ->collapsed(fn (?NewsPost $record) => blank($record?->source_url))
+                    ->components([
+                        TextInput::make('source_name')
+                            ->maxLength(255),
+
+                        TextInput::make('source_url')
+                            ->label('Source URL')
+                            ->url()
+                            ->maxLength(255),
+                    ]),
             ]);
     }
 }

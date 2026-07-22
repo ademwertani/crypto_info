@@ -11,12 +11,12 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
 #[Signature('app:fetch-news')]
-#[Description('Fetch latest crypto news from CryptoPanic RSS and store in DB')]
+#[Description('Fetch latest crypto news from RSS and store in DB')]
 class FetchNews extends Command
 {
     public function handle(NewsApiService $api, AiSummaryService $ai): int
     {
-        $this->info('Fetching news from CryptoPanic RSS…');
+        $this->info('Fetching news from RSS…');
 
         if (! class_exists(\App\Models\News::class)) {
             $this->error('News model is not available.');

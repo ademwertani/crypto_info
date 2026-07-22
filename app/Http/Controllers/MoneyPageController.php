@@ -9,10 +9,29 @@ use Illuminate\View\View;
 
 class MoneyPageController extends Controller
 {
+    private const PER_PAGE = 12;
+
     // Deliberately simple regex, no package: catches the crawlers/tools
     // that would otherwise inflate the view counter (search engines, SEO
     // crawlers, social-share unfurlers, generic HTTP clients).
     private const BOT_UA_PATTERN = '/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|curl|wget|python-requests|scrapy|headless/i';
+
+    public function index(Request $request): View
+    {
+        $cluster = (string) $request->query('cluster', '');
+
+        $query = MoneyPage::query()->published()->latest('published_at');
+
+        if ($cluster !== '') {
+            $query->where('cluster', $cluster);
+        }
+
+        $pages    = $query->paginate(self::PER_PAGE)->withQueryString();
+        $clusters = MoneyPage::query()->published()->select('cluster')->distinct()->orderBy('cluster')->pluck('cluster');
+        $seo      = SeoService::forGuidesIndex();
+
+        return view('guides.index', compact('pages', 'clusters', 'cluster', 'seo'));
+    }
 
     public function show(Request $request, MoneyPage $moneyPage): View
     {

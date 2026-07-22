@@ -9,6 +9,7 @@ use App\Filament\Resources\NewsPosts\Schemas\NewsPostForm;
 use App\Filament\Resources\NewsPosts\Tables\NewsPostsTable;
 use App\Models\NewsPost;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,10 @@ class NewsPostResource extends Resource
     protected static ?string $model = NewsPost::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Editorial';
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $navigationLabel = 'News';
 

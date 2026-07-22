@@ -153,7 +153,7 @@
 
                 {{-- "More" dropdown: groups secondary market pages + company/legal pages that already exist in the footer --}}
                 @php
-                    $moreActive = request()->routeIs(['market.bitcoin-dominance', 'market.global-cap', 'pages.*']);
+                    $moreActive = request()->routeIs(['market.bitcoin-dominance', 'market.global-cap', 'guides.*', 'platforms.compare', 'pages.*']);
                 @endphp
                 <div class="relative" x-data="{ moreOpen: false }" @click.outside="moreOpen = false" @keydown.escape="moreOpen = false">
                     <button type="button" @click="moreOpen = !moreOpen"
@@ -179,6 +179,9 @@
                          aria-label="{{ __('nav.more') }}">
                         <a href="{{ route('market.bitcoin-dominance') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.btc_dominance') }}</a>
                         <a href="{{ route('market.global-cap') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.market_cap') }}</a>
+                        <div class="my-1.5 border-t border-slate-800"></div>
+                        <a href="{{ route('guides.index') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.guides') }}</a>
+                        <a href="{{ route('platforms.compare') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.compare_platforms') }}</a>
                         <div class="my-1.5 border-t border-slate-800"></div>
                         <a href="{{ route('pages.about') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.about') }}</a>
                         <a href="{{ route('advertise.show') }}" role="menuitem" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">{{ __('footer.advertise') }}</a>
@@ -269,6 +272,8 @@
         <div class="border-t border-slate-800 pt-3 mb-3">
             <p class="text-[10px] uppercase tracking-widest text-slate-600 mb-2 px-1">{{ __('nav.resources') }}</p>
             <div class="grid grid-cols-2 gap-1 text-sm mb-3">
+                <a href="{{ route('guides.index') }}"      class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.guides') }}</a>
+                <a href="{{ route('platforms.compare') }}" class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.compare_platforms') }}</a>
                 <a href="{{ route('pages.about') }}"       class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.about') }}</a>
                 <a href="{{ route('advertise.show') }}"    class="px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300">{{ __('footer.advertise') }}</a>
             </div>
@@ -357,6 +362,8 @@
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('blog.index') }}" class="hover:text-white transition">{{ __('footer.blog') }}</a></li>
                     <li><a href="{{ route('news.index') }}" class="hover:text-white transition">{{ __('footer.crypto_news') }}</a></li>
+                    <li><a href="{{ route('guides.index') }}" class="hover:text-white transition">{{ __('footer.guides') }}</a></li>
+                    <li><a href="{{ route('platforms.compare') }}" class="hover:text-white transition">{{ __('footer.compare_platforms') }}</a></li>
                 </ul>
             </div>
 

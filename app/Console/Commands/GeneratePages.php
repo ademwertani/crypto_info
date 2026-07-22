@@ -24,8 +24,8 @@ class GeneratePages extends Command
     {
         $dryRun = (bool) $this->option('dry-run');
 
-        if (! $dryRun && blank(config('services.anthropic.api_key'))) {
-            $this->error('ANTHROPIC_API_KEY is not set — add it to .env before running this command.');
+        if (! $dryRun && blank(config('services.groq.api_key'))) {
+            $this->error('GROQ_API_KEY is not set — add it to .env before running this command.');
 
             return self::FAILURE;
         }

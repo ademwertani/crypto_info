@@ -55,6 +55,7 @@ Route::get('/news/{news:slug}', [NewsController::class, 'show'])
     ->where('news', '[a-z0-9\-]+')
     ->name('news.show');
 
+Route::get('/guides', [MoneyPageController::class, 'index'])->name('guides.index');
 Route::get('/guides/{moneyPage:slug}', [MoneyPageController::class, 'show'])
     ->where('moneyPage', '[a-z0-9\-]+')
     ->name('guides.show');

@@ -9,6 +9,7 @@ use App\Filament\Resources\MoneyPages\Schemas\MoneyPageForm;
 use App\Filament\Resources\MoneyPages\Tables\MoneyPagesTable;
 use App\Models\MoneyPage;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,10 @@ class MoneyPageResource extends Resource
     protected static ?string $model = MoneyPage::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Editorial';
+
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $navigationLabel = 'Money Pages';
 

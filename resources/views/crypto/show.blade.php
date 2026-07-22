@@ -79,6 +79,17 @@
         </a>
     </div>
 
+    {{-- Buy guide CTA --}}
+    @if ($buyGuide)
+    <a href="{{ route('guides.show', $buyGuide->slug) }}"
+       class="mb-6 flex items-center justify-between gap-3 rounded-xl border border-blue-800/40 bg-blue-950/30 p-4 hover:border-blue-600/60 transition">
+        <span class="text-sm text-slate-300">
+            <span class="font-semibold text-white">{{ $buyGuide->h1 }}</span>
+        </span>
+        <span class="shrink-0 text-sm font-semibold text-blue-400">{{ __('guides.read_guide') }} →</span>
+    </a>
+    @endif
+
     {{-- AI explanation --}}
     @if (!empty($aiExplanation))
     <div class="mb-6 rounded-xl border border-blue-800/40 bg-blue-950/30 p-4">

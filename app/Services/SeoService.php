@@ -288,6 +288,30 @@ class SeoService
         return $seo;
     }
 
+    public static function forGuidesIndex(): self
+    {
+        $seo              = new self();
+        $seo->title       = 'Crypto Guides & Exchange Reviews | CryptoInfo';
+        $seo->description = 'Practical, beginner-friendly guides on buying crypto, choosing an exchange or wallet, and honest platform reviews.';
+        $seo->canonical   = route('guides.index');
+        $seo->breadcrumbLabel = 'Guides';
+        $seo->image       = url('/images/og-default.svg');
+        $seo->locale      = app()->getLocale();
+        $seo->alternateLanguages = [
+            'x-default' => $seo->canonical,
+            'en'        => $seo->canonical,
+        ];
+        $seo->jsonld      = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'CollectionPage',
+            'name'        => $seo->title,
+            'description' => $seo->description,
+            'url'         => $seo->canonical,
+        ];
+
+        return $seo;
+    }
+
     public static function forPlatformComparisonIndex(): self
     {
         $seo = new self();

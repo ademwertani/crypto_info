@@ -9,6 +9,7 @@ use App\Filament\Resources\Platforms\Schemas\PlatformForm;
 use App\Filament\Resources\Platforms\Tables\PlatformsTable;
 use App\Models\Platform;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,10 @@ class PlatformResource extends Resource
     protected static ?string $model = Platform::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Platforms';
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $navigationLabel = 'Platforms';
 

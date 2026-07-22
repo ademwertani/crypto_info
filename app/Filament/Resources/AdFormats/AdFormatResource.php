@@ -9,6 +9,7 @@ use App\Filament\Resources\AdFormats\Schemas\AdFormatForm;
 use App\Filament\Resources\AdFormats\Tables\AdFormatsTable;
 use App\Models\AdFormat;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,10 @@ class AdFormatResource extends Resource
     protected static ?string $model = AdFormat::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMegaphone;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Advertise';
+
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $navigationLabel = 'Ad Formats';
 

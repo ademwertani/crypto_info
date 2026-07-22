@@ -9,6 +9,7 @@ use App\Filament\Resources\PlatformComparisons\Schemas\PlatformComparisonForm;
 use App\Filament\Resources\PlatformComparisons\Tables\PlatformComparisonsTable;
 use App\Models\PlatformComparison;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -19,6 +20,10 @@ class PlatformComparisonResource extends Resource
     protected static ?string $model = PlatformComparison::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Platforms';
+
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $navigationLabel = 'Platform Comparisons';
 
