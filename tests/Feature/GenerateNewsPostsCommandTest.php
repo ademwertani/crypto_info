@@ -62,7 +62,7 @@ XML;
         Http::assertNotSent(fn ($request) => str_contains($request->url(), 'api.groq.com'));
     }
 
-    public function test_generates_a_draft_from_a_real_rss_item(): void
+    public function test_generates_and_publishes_immediately_from_a_real_rss_item(): void
     {
         config(['services.groq.api_key' => 'test-key']);
         $this->fakeRssEndpoints();
@@ -73,13 +73,17 @@ XML;
 
         $post = NewsPost::first();
         $this->assertSame('Example Exchange Reports Record Trading Volume', $post->title);
-        $this->assertSame('draft', $post->status);
+        $this->assertSame('published', $post->status);
         $this->assertSame('https://example.com/news/record-volume', $post->source_url);
         $this->assertNotEmpty($post->content);
         $this->assertSame('2026-07-22', $post->published_at->format('Y-m-d'));
+
+        // No manual "publish" step in the dashboard — it's live right away.
+        $this->get('/news/'.$post->slug)->assertOk()->assertSee($post->title);
+        $this->get('/news')->assertSee($post->title);
     }
 
-    public function test_rerun_is_idempotent_and_skips_already_drafted_articles(): void
+    public function test_rerun_is_idempotent_and_skips_already_published_articles(): void
     {
         config(['services.groq.api_key' => 'test-key']);
         $this->fakeRssEndpoints();

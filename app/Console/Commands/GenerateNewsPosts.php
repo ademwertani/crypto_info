@@ -13,7 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 
 #[Signature('news:generate {--limit=10} {--dry-run}')]
-#[Description('Draft NewsPost articles from real RSS news items via the Groq API — always drafts, expands only real facts, never invents news')]
+#[Description('Publish NewsPost articles from real RSS news items via the Groq API — goes live immediately, expands only real facts, never invents news')]
 class GenerateNewsPosts extends Command
 {
     // Hard ceiling regardless of what --limit is passed — cost control
@@ -58,7 +58,7 @@ class GenerateNewsPosts extends Command
 
             if (NewsPost::where('source_url', $item['url'])->exists()) {
                 $skipped++;
-                $rows[] = [$item['title'], $item['source'] ?? '—', 'skipped (already drafted)'];
+                $rows[] = [$item['title'], $item['source'] ?? '—', 'skipped (already exists)'];
 
                 continue;
             }
@@ -80,14 +80,17 @@ class GenerateNewsPosts extends Command
                     // it, so an unusually long one would crash the batch
                     // the same way.
                     'title' => Str::limit($item['title'], 191, ''),
-                    'status' => 'draft',
+                    // Published immediately, no draft review step — the
+                    // "no invented facts" prompt is the only safety net
+                    // here (see NewsPostGeneratorService).
+                    'status' => 'published',
                     'published_at' => $item['published_at'] ?? now(),
                     'source_url' => $item['url'],
                     'source_name' => $item['source'] ?? null,
                 ]);
 
                 $generated++;
-                $rows[] = [$item['title'], $item['source'] ?? '—', 'generated (draft)'];
+                $rows[] = [$item['title'], $item['source'] ?? '—', 'generated (published)'];
             } catch (NewsPostGenerationException|QueryException $e) {
                 $failed++;
                 $rows[] = [$item['title'], $item['source'] ?? '—', 'FAILED'];

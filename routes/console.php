@@ -26,8 +26,8 @@ Schedule::command('app:fetch-news')
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/schedule-fetch-news.log'));
 
-// Draft NewsPost articles from real RSS items via AI — always drafts, still
-// needs a human to review and publish in /admin/news-posts.
+// Publish NewsPost articles from real RSS items via AI — goes live
+// immediately, no manual review step (see GenerateNewsPosts).
 Schedule::command('news:generate --limit=5')
     ->everyThreeHours()
     ->withoutOverlapping()
